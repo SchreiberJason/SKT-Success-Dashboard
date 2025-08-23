@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKT Success Dashboard</title>
+    <!-- Tailwind CSS CDN für schnelle und responsive Stile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome für Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Definieren der benutzerdefinierten Farben von SKT Finance für Tailwind */
+        :root {
+            --color-skt-blue: #002147;
+            --color-skt-blue-light: #043C64;
+            --color-skt-grey-light: #f5f5f5;
+            --color-skt-grey-medium: #c7c7c7;
+            --color-skt-blue-main: #38bdf8;
+            --color-accent-green: #27ae60;
+            --color-accent-red: #FF6347;
+            --color-accent-yellow: #f1c40f;
+        }
+
+        .bg-skt-blue { background-color: var(--color-skt-blue); }
+        .bg-skt-blue-light { background-color: var(--color-skt-blue-light); }
+        .bg-skt-grey-light { background-color: var(--color-skt-grey-light); }
+        .bg-skt-grey-medium { background-color: var(--color-skt-grey-medium); }
+        .text-skt-blue { color: var(--color-skt-blue); }
+        .text-skt-blue-light { color: var(--color-skt-blue-light); }
+        .text-skt-blue-main { color: var(--color-skt-blue-main); }
+        .border-skt-blue-main { border-color: var(--color-skt-blue-main); }
+
+        /* Neue Akzentfarben */
+        .text-skt-green-accent { color: var(--color-accent-green); }
+        .bg-skt-green-accent { background-color: var(--color-accent-green); }
+        .text-skt-red-accent { color: var(--color-accent-red); }
+        .bg-skt-red-accent { background-color: var(--color-accent-red); }
+        .text-skt-yellow-accent { color: var(--color-accent-yellow); }
+        .bg-skt-yellow-accent { background-color: var(--color-accent-yellow); }
+        
+        /* Setzen der Schriftart für das gesamte Dashboard auf eine serifenlose Schriftart, wie in der Liste angegeben */
+        body {
+            font-family: sans-serif;
+            background-color: var(--color-skt-grey-light);
+        }
+
+        /* Spezieller Stil für die Überschrift mit Times New Roman */
+        .font-times-new-roman {
+            font-family: "Times New Roman", Times, serif;
+        }
+        
+        /* Stile für den Fortschrittskreis */
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+        .progress-circle .bg-circle {
+            fill: none;
+            stroke: var(--color-skt-grey-medium);
+            stroke-width: 10;
+        }
+        .progress-circle .progress-arc {
+            fill: none;
+            stroke: var(--color-accent-green);
+            stroke-width: 10;
+            transition: stroke-dashoffset 0.7s ease-out;
+            stroke-linecap: round;
+        }
+
+        /* Neue, dezentere Stile für das Monatsplanungs-Kreisdiagramm */
+        .progress-circle-monthly {
+            transform: rotate(-90deg);
+        }
+        .progress-circle-monthly .bg-circle {
+            fill: none;
+            stroke: #e2e8f0;
+            stroke-width: 8; /* Dezenter */
+        }
+        .progress-circle-monthly .progress-arc-eh {
+            fill: none;
+            stroke: var(--color-accent-green);
+            stroke-width: 10; /* Etwas breiter für EH */
+            transition: stroke-dashoffset 0.7s ease-out;
+            stroke-linecap: round;
+        }
+        .progress-circle-monthly .progress-arc-et {
+            fill: none;
+            stroke: var(--color-skt-blue-main);
+            stroke-width: 7; /* Etwas dünner für ET */
+            transition: stroke-dashoffset 0.7s ease-out;
+            stroke-linecap: round;
+        }
+
+        /* Stile für die Karrierestufen-Karten */
+        .tier-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent; /* Standard-Transparenter Rand */
+        }
+        .tier-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        /* Aktive Stufe wird jetzt mit dem grünen Akzent umrandet */
+        .tier-card.active {
+            border: 2px solid var(--color-accent-green);
+        }
+        
+        /* Stile für Mitarbeiter-Slots */
+        .employee-slot {
+            width: 20px;
+            height: 20px;
+            background-color: var(--color-skt-grey-medium);
+            border-radius: 50%;
+            transition: background-color 0.3s ease-out;
+            border: 1px solid var(--color-skt-grey-medium);
+        }
+        .employee-slot.filled {
+            background-color: var(--color-accent-green);
+        }
+        
+        /* Stile für das Dropdown-Menü */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 50;
+            width: 200px;
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .user-list li {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        .user-list li:hover {
+            background-color: #f5f5f5;
+        }
+        .user-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--color-skt-grey-medium);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            transition: width 0.7s ease-out;
+            border-radius: 4px;
+        }
+        
+        /* Neuer Stil für die vertikalen Linien zwischen den Wochen */
+        .week-divider {
+            position: absolute;
+            height: calc(100% + 0.25rem); /* Kürzere Linie, jetzt halb so lang */
+            top: -0.125rem;
+            width: 2px;
+            background-color: #e2e8f0; /* Dezente graue Linie */
+            z-index: 10;
+        }
+        
+        /* Stil für die vertikalen Linien am Anfang und Ende des Balkens (jetzt wie die Wochen-Trenner) */
+        .start-end-divider {
+            position: absolute;
+            height: calc(100% + 0.25rem); /* Kürzere Linie, jetzt halb so lang */
+            top: -0.125rem;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 10;
+        }
+        
+        /* Stil für das zentrierte Datums-Label mit größerem Abstand */
+        .centered-date-label {
+            position: absolute;
+            bottom: -1.25rem; /* Größerer Abstand */
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-skt-blue-light);
+            white-space: nowrap;
+            z-index: 30;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-skt-blue">
+
+    <!-- Begrüßungs-Banner -->
+    <header class="w-full p-8 md:p-12 bg-skt-blue relative rounded-b-3xl">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
+            <div class="flex flex-col">
+                <h1 class="text-4xl sm:text-5xl font-bold font-times-new-roman text-white mb-2" id="welcome-header">Willkommen,</h1>
+                <p class="text-lg sm:text-xl text-skt-blue-main">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
+            </div>
+            <!-- Container für den Benutzer-Button und das Dropdown-Menü -->
+            <div class="relative mt-4 sm:mt-0">
+                <!-- Neuer Benutzer-Button -->
+                <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors">
+                    Benutzer
+                </button>
+                <!-- Dropdown-Menü -->
+                <div id="user-dropdown" class="dropdown-menu hidden">
+                    <ul id="user-list" class="user-list">
+                        <!-- Benutzer werden hier dynamisch eingefügt -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hauptbereich mit Karrieredaten und Zielen -->
+    <main class="flex flex-col w-full max-w-7xl mx-auto flex-grow p-6 md:p-8 space-y-12">
+        
+        <!-- Status- und Ladeanzeige -->
+        <div id="status-message" class="text-center text-lg font-semibold text-skt-blue mt-6">Daten werden geladen...</div>
+
+        <!-- Sektion: Monatsplanung - NEUES DESIGN -->
+        <section class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+            <h2 class="text-2xl font-semibold text-skt-blue mb-6 text-center">Deine Monatsplanung</h2>
+            
+            <!-- Sektion: Monatsfortschritt -->
+            <div class="mb-8">
+                <!-- Container für die neue Wochen-Visualisierung -->
+                <div id="weekly-progress-container" class="w-full flex relative h-20 mb-4 items-end">
+                    <!-- Inhalt wird dynamisch über JavaScript eingefügt -->
+                </div>
+            </div>
+
+            <!-- Sektion: Monatsziel-Fortschritt (Kreisdiagramme & Daten) -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                <!-- Kombiniertes Kreisdiagramm (links) -->
+                <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-sm max-h-sm">
+                    <svg class="progress-circle-monthly w-full h-full" viewBox="0 0 100 100">
+                        <!-- Hintergrund-Kreis für Einheiten (größerer Kreis) -->
+                        <circle class="bg-circle" cx="50" cy="50" r="40"></circle>
+                        <!-- Hintergrund-Kreis für ETs (kleinerer Kreis) -->
+                        <circle class="bg-circle" cx="50" cy="50" r="30"></circle>
+
+                        <!-- Fortschritts-Kreis für Einheiten -->
+                        <circle class="progress-arc-eh" cx="50" cy="50" r="40" id="progress-circle-eh"></circle>
+                        <!-- Fortschritts-Kreis für ETs -->
+                        <circle class="progress-arc-et" cx="50" cy="50" r="30" id="progress-circle-et"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
+                        <p class="text-3xl font-bold text-skt-green-accent" id="eh-percentage-text">0%</p>
+                        <p class="text-sm text-gray-500">Einheiten</p>
+                        <div class="mt-4">
+                            <p class="text-xl font-bold text-skt-blue-main" id="et-percentage-text">0%</p>
+                            <p class="text-xs text-gray-500">Termine</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Datenkarten (rechts) -->
+                <div class="flex-grow md:w-1/2 grid grid-cols-2 gap-4 w-full">
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">Ziel Einheiten</p>
+                        <p class="text-xl font-bold text-skt-blue mt-1"><span id="eh-current">0</span>/<span id="eh-goal">0</span></p>
+                    </div>
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">Ziel Termine</p>
+                        <p class="text-xl font-bold text-skt-blue mt-1"><span id="et-current">0</span>/<span id="et-goal">0</span></p>
+                    </div>
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">AT Soll</p>
+                        <p class="text-xl font-bold text-skt-blue mt-1" id="at-soll-display">0</p>
+                    </div>
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">Offene Aufgaben</p>
+                        <p class="text-xl font-bold text-skt-blue mt-1" id="open-tasks">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Sektion: Aktueller Fortschritt -->
+        <section class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+            <h2 class="text-2xl font-semibold text-skt-blue mb-6 text-center">Dein aktueller Fortschritt</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- T1-Karte -->
+                <div id="tier-1-card" class="tier-card active">
+                    <h3 class="text-2xl font-bold mb-2 text-skt-blue">T1</h3>
+                    <p class="text-sm text-skt-blue-light mb-4">0 EH</p>
+                    <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
+                        <div id="tier-1-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <!-- T2-Karte -->
+                <div id="tier-2-card" class="tier-card">
+                    <h3 class="text-2xl font-bold mb-2 text-skt-blue">T2</h3>
+                    <p class="text-sm text-skt-blue-light mb-4">1.250 EH</p>
+                    <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
+                        <div id="tier-2-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <!-- T3-Karte -->
+                <div id="tier-3-card" class="tier-card">
+                    <h3 class="text-2xl font-bold mb-2 text-skt-blue">T3</h3>
+                    <p class="text-sm text-skt-blue-light mb-4">2.500 EH</p>
+                    <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
+                        <div id="tier-3-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <!-- Junior GST-Karte -->
+                <div id="tier-gst-card" class="tier-card">
+                    <h3 class="text-2xl font-bold mb-2 text-skt-blue">Junior GST</h3>
+                    <p class="text-sm text-skt-blue-light mb-4">4.000 EH</p>
+                    <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
+                        <div id="tier-gst-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <!-- Kreisdiagramm (links) -->
+                <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-96 max-h-96">
+                    <svg class="progress-circle w-full h-full" viewBox="0 0 100 100">
+                        <!-- Hintergrund-Kreis -->
+                        <circle class="bg-circle" cx="50" cy="50" r="40"></circle>
+                        <!-- Fortschritts-Kreis -->
+                        <circle class="progress-arc" cx="50" cy="50" r="40" id="progress-circle-career"></circle>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
+                        <!-- Der Text wird jetzt dynamisch aktualisiert, um den Fortschritt zur nächsten Stufe anzuzeigen -->
+                        <p id="career-progress-percentage" class="text-5xl font-bold text-skt-blue">0%</p>
+                        <p class="text-sm text-skt-blue-light mt-1" id="progress-to-next-text">Fortschritt zum ...</p>
+                    </div>
+                </div>
+    
+                <!-- Detaillierte Infos (rechts) -->
+                <div class="flex-grow md:w-1/2 grid grid-cols-2 gap-4 w-full">
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">Erreichte EH (insgesamt)</p>
+                        <p class="text-2xl font-bold text-skt-blue mt-1"><span id="current-eh-display">0</span> EH</p>
+                    </div>
+                    <!-- Angepasste Mitarbeiter-Karte -->
+                    <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                        <p class="text-xs text-skt-blue-light font-bold">Mitarbeiter</p>
+                        <div id="employee-info-container" class="mt-1 flex flex-col items-center justify-center">
+                             <!-- Dynamische Inhalte für Mitarbeiter und Ziel werden hier eingefügt -->
+                             <p class="text-2xl font-bold text-skt-blue" id="employee-count-display">0</p>
+                             <p id="employee-goal-status" class="text-skt-blue-light text-sm mt-1">...</p>
+                        </div>
+                        <div id="employee-slots-container" class="flex space-x-2 mt-2">
+                             <!-- Dynamische Mitarbeiter-Slots werden hier eingefügt -->
+                        </div>
+                    </div>
+                    <div class="p-4 col-span-2 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                        <p id="next-milestone" class="text-skt-blue-light text-sm font-bold">Nächster Meilenstein: <span class="text-skt-blue font-semibold">...</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>      
+    </main>
+
+    <script>
+        // --- KONFIGURATION FÜR GOOGLE SHEETS
+        const spreadsheetId = "1n8NQjGpZpkETLFw7JoY96aYFzwR9_V0WtWwBM9MsN7w";
+        const sheetDataName = "Daten";
+        // Neues Tabellenblatt für Beförderungsdaten
+        const sheetPromotionsName = "Anstehende Beförderungen";
+        
+        // **ÄNDERUNG**: Der Standardbenutzer, falls kein Name in der URL gefunden wird
+        const initialUser = "Alexander Hones";
+
+        // --- VARIABLEN
+        // Monatsziele und -fortschritte
+        let monthlyTargetEh = 0;
+        let monthlyCurrentEh = 0;
+        let atSoll = 0;
+        let etSoll = 0;
+        let istEt = 0;
+        let totalCurrentEh = 0;
+        let istAt = 0;
+        // Die Mitarbeiteranzahl wird nun aus der "Daten"-Tabelle gelesen, aber das Ziel aus der "Anstehende Beförderungen"-Tabelle
+        let employeeCount = 0; 
+        // Variablen für die neuen Beförderungsdaten
+        let employeeGoal = null; // Kann 'BL', 'GST' oder 'none' sein
+        let employeesMissing = null;
+        let requiredEmployees = 0;
+
+        const startDatumDashboard = new Date('2024-01-01T00:00:00');
+        const jetzt = new Date();
+        
+        // --- NEUE KONFIGURATION FÜR KARRIERE-STUFEN
+        // Die EH-Ziele für die Karrierestufen. T1 ist erreicht, wenn 1250 EH erreicht sind, T2 bei 2500 etc.
+        const tierGoals = [
+            { name: "T1", goal: 1250 },
+            { name: "T2", goal: 2500 },
+            { name: "T3", goal: 4000 },
+            { name: "Junior GST", goal: 4001 } // Als besonderes Ziel
+        ];
+
+        // DOM-Elemente
+        const welcomeHeader = document.getElementById('welcome-header');
+        const statusMessage = document.getElementById('status-message');
+        const fortschrittKreisKarriere = document.getElementById('progress-circle-career');
+        const careerProgressPercentage = document.getElementById('career-progress-percentage');
+        const progressToNextText = document.getElementById('progress-to-next-text');
+        const currentEhDisplay = document.getElementById('current-eh-display');
+        const nextMilestone = document.getElementById('next-milestone');
+        
+        // NEUE DOM-Elemente für die Monatsplanung
+        const weeklyProgressContainer = document.getElementById('weekly-progress-container');
+        const ehProgressCircle = document.getElementById('progress-circle-eh');
+        const etProgressCircle = document.getElementById('progress-circle-et');
+        const ehPercentageText = document.getElementById('eh-percentage-text');
+        const etPercentageText = document.getElementById('et-percentage-text');
+        const ehCurrentDisplay = document.getElementById('eh-current');
+        const ehGoalDisplay = document.getElementById('eh-goal');
+        const etCurrentDisplay = document.getElementById('et-current');
+        const etGoalDisplay = document.getElementById('et-goal');
+        // NEUES ELEMENT für AT Soll
+        const atSollDisplay = document.getElementById('at-soll-display');
+        
+        const employeeCountDisplay = document.getElementById('employee-count-display');
+        const employeeSlotsContainer = document.getElementById('employee-slots-container');
+        const employeeGoalStatus = document.getElementById('employee-goal-status');
+
+        // Tier-Elemente
+        const tierCards = [
+            document.getElementById('tier-1-card'),
+            document.getElementById('tier-2-card'),
+            document.getElementById('tier-3-card'),
+            document.getElementById('tier-gst-card')
+        ];
+        const tierProgressBars = [
+            document.getElementById('tier-1-progress'),
+            document.getElementById('tier-2-progress'),
+            document.getElementById('tier-3-progress'),
+            document.getElementById('tier-gst-progress')
+        ];
+        
+        // Dropdown-Elemente
+        const userSelectButton = document.getElementById('user-select-button');
+        const userDropdown = document.getElementById('user-dropdown');
+        const userListElement = document.getElementById('user-list');
+
+        // --- FUNKTIONEN ---
+        
+        // Funktion zur Bestimmung des aktuellen Verkaufsmonats (beginnt am ersten Mittwoch des Monats und endet vor dem ersten Mittwoch des nächsten Monats)
+        function getMonthlyCycleDates() {
+            const today = new Date();
+            let currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            let nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            
+            // Finde den ersten Mittwoch des aktuellen Monats
+            while (currentMonthStart.getDay() !== 3) { // 3 = Mittwoch
+                currentMonthStart.setDate(currentMonthStart.getDate() + 1);
+            }
+            
+            // Finde den ersten Mittwoch des nächsten Monats
+            while (nextMonthStart.getDay() !== 3) {
+                nextMonthStart.setDate(nextMonthStart.getDate() + 1);
+            }
+
+            // Der Verkaufsmonat endet inkl. des ersten Mittwochs im nächsten Monat
+            const currentMonthEnd = nextMonthStart;
+            
+            return { startDate: currentMonthStart, endDate: currentMonthEnd };
+        }
+
+        // Neue Funktion zum Aktualisieren der Wochen-Visualisierung
+        function updateWeeklyProgress() {
+            const { startDate, endDate } = getMonthlyCycleDates();
+            const today = new Date();
+            weeklyProgressContainer.innerHTML = ''; // Löscht alte Elemente
+
+            // Gesamtdauer in Tagen
+            const totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            const daysInAWeek = 7;
+            const totalWeeks = Math.ceil(totalDays / daysInAWeek);
+            
+            // Formatierungsoptionen für die Datenanzeige
+            const dateOptions = { day: '2-digit', month: '2-digit' };
+            
+            // Erstellt die vertikale Linie am Anfang des Fortschrittsbalkens
+            const startDivider = document.createElement('div');
+            startDivider.classList.add('start-end-divider');
+            startDivider.style.left = '0%';
+            weeklyProgressContainer.appendChild(startDivider);
+
+            // Fügt das Startdatum-Label hinzu
+            const startLabel = document.createElement('div');
+            startLabel.classList.add('centered-date-label'); // Neue Klasse für Zentrierung und Abstand
+            startLabel.style.left = '0%';
+            startLabel.style.transform = 'translateX(-50%)'; // Zentriert das Label unter dem Strich
+            startLabel.textContent = startDate.toLocaleDateString('de-DE', dateOptions);
+            weeklyProgressContainer.appendChild(startLabel);
+            
+            // Schleife durch die Wochen
+            for (let i = 0; i < totalWeeks; i++) {
+                const weekStart = new Date(startDate.getTime() + (i * daysInAWeek * (1000 * 60 * 60 * 24)));
+                const weekEnd = new Date(weekStart.getTime() + (daysInAWeek * (1000 * 60 * 60 * 24)));
+
+                // Ist dies die aktuelle Woche?
+                const isCurrentWeek = (today >= weekStart && today < weekEnd);
+                const isPassedWeek = (today >= weekEnd);
+
+                let progress = 0;
+                if (isPassedWeek) {
+                    progress = 100;
+                } else if (isCurrentWeek) {
+                    const daysPassedInWeek = (today - weekStart) / (1000 * 60 * 60 * 24);
+                    progress = (daysPassedInWeek / daysInAWeek) * 100;
+                }
+                
+                // HTML für die Woche erstellen
+                const weekDiv = document.createElement('div');
+                weekDiv.classList.add('flex-1', 'h-full', 'relative', 'p-2', 'flex', 'flex-col', 'items-center', 'z-20');
+                
+                // Fortschrittsbalken
+                const progressBarContainer = document.createElement('div');
+                progressBarContainer.classList.add('w-full', 'bg-skt-grey-medium', 'h-2', 'rounded-full', 'overflow-hidden');
+                
+                const progressBar = document.createElement('div');
+                progressBar.classList.add('h-full', 'bg-skt-green-accent', 'rounded-full', 'transition-all', 'duration-500');
+                progressBar.style.width = `${Math.min(progress, 100)}%`;
+
+                progressBarContainer.appendChild(progressBar);
+                weekDiv.appendChild(progressBarContainer);
+                weeklyProgressContainer.appendChild(weekDiv);
+            }
+
+            // Schleife zum Hinzufügen der vertikalen Linien und Daten
+            const weeksDivs = weeklyProgressContainer.querySelectorAll('.flex-1');
+            if (weeksDivs.length > 0) {
+                // Füge Linien zwischen den Wochen-Balken hinzu
+                for (let i = 0; i < weeksDivs.length - 1; i++) {
+                    const divider = document.createElement('div');
+                    divider.classList.add('week-divider');
+                    // Positioniere die Linie in der Mitte zwischen zwei Wochen-Balken
+                    divider.style.left = `${(i + 1) * (100 / weeksDivs.length)}%`;
+                    weeklyProgressContainer.appendChild(divider);
+
+                    // Füge das Datum-Label unter der Linie hinzu
+                    const weekStart = new Date(startDate.getTime() + ((i + 1) * daysInAWeek * (1000 * 60 * 60 * 24)));
+                    const dateLabel = document.createElement('div');
+                    dateLabel.classList.add('centered-date-label');
+                    dateLabel.style.left = `${(i + 1) * (100 / weeksDivs.length)}%`;
+                    dateLabel.style.transform = 'translateX(-50%)';
+                    dateLabel.textContent = weekStart.toLocaleDateString('de-DE', dateOptions);
+                    weeklyProgressContainer.appendChild(dateLabel);
+                }
+            }
+
+            // Erstellt die vertikale Linie am Ende des Fortschrittsbalkens
+            const endDivider = document.createElement('div');
+            endDivider.classList.add('start-end-divider');
+            endDivider.style.right = '0%';
+            weeklyProgressContainer.appendChild(endDivider);
+
+            // Fügt das Enddatum-Label hinzu
+            const endLabel = document.createElement('div');
+            endLabel.classList.add('centered-date-label');
+            endLabel.style.right = '0%';
+            endLabel.style.transform = 'translateX(50%)'; // Zentriert das Label unter dem Strich
+            endLabel.textContent = endDate.toLocaleDateString('de-DE', dateOptions);
+            weeklyProgressContainer.appendChild(endLabel);
+        }
+
+        // Funktion zum Aktualisieren der Fortschrittsanzeigen
+        function updateProgress() {
+            updateWeeklyProgress();
+
+            // Monatsdaten anzeigen im neuen Design
+            ehCurrentDisplay.textContent = Math.round(monthlyCurrentEh);
+            ehGoalDisplay.textContent = Math.round(monthlyTargetEh);
+            etCurrentDisplay.textContent = Math.round(istEt);
+            etGoalDisplay.textContent = Math.round(etSoll);
+            atSollDisplay.textContent = Math.round(atSoll);
+            
+            // Logik für die neuen Kreisdiagramme
+            const ehPercentage = (monthlyCurrentEh / monthlyTargetEh) * 100;
+            const etPercentage = (istEt / etSoll) * 100;
+
+            ehPercentageText.textContent = `${Math.min(ehPercentage, 100).toFixed(1)}%`;
+            etPercentageText.textContent = `${Math.min(etPercentage, 100).toFixed(1)}%`;
+
+            const radiusEh = 40;
+            const circumferenceEh = 2 * Math.PI * radiusEh;
+            const offsetEh = circumferenceEh * (1 - Math.min(ehPercentage, 100) / 100);
+            ehProgressCircle.style.strokeDasharray = circumferenceEh;
+            ehProgressCircle.style.strokeDashoffset = offsetEh;
+            
+            const radiusEt = 30;
+            const circumferenceEt = 2 * Math.PI * radiusEt;
+            const offsetEt = circumferenceEt * (1 - Math.min(etPercentage, 100) / 100);
+            etProgressCircle.style.strokeDasharray = circumferenceEt;
+            etProgressCircle.style.strokeDashoffset = offsetEt;
+
+            // Zeigt den Gesamt-EH-Wert an
+            currentEhDisplay.textContent = Math.round(totalCurrentEh);
+            
+            // --- NEUE LOGIK FÜR KARRIEREFORTSCHRITT ---
+            
+            let currentTierIndex = -1;
+            let currentTierGoal = 0;
+            let nextTierGoal = 0;
+            let nextTierName = "";
+
+            // Bestimme die aktuelle Stufe und die nächste Stufe basierend auf den neuen EH-Grenzwerten
+            if (totalCurrentEh < 1251) {
+                currentTierIndex = 0;
+                nextTierGoal = 1250;
+                nextTierName = "T2";
+            } else if (totalCurrentEh < 2501) {
+                currentTierIndex = 1;
+                currentTierGoal = 1250;
+                nextTierGoal = 2500;
+                nextTierName = "T3";
+            } else if (totalCurrentEh < 4001) {
+                currentTierIndex = 2;
+                currentTierGoal = 2500;
+                nextTierGoal = 4000;
+                nextTierName = "Junior GST";
+            } else {
+                currentTierIndex = 3; // Junior GST erreicht
+            }
+            
+            // Setze alle Karten und Fortschrittsbalken zurück
+            tierCards.forEach(card => card.classList.remove('active'));
+            tierProgressBars.forEach(bar => bar.style.width = '0%');
+
+            if (currentTierIndex === 3) {
+                // Junior GST erreicht: Alle Karten auf 100% und aktiv setzen
+                tierCards.forEach(card => card.classList.add('active'));
+                tierProgressBars.forEach(bar => bar.style.width = '100%');
+                careerProgressPercentage.textContent = "100%";
+                progressToNextText.textContent = "Junior GST erreicht!";
+                nextMilestone.innerHTML = `Nächster Meilenstein: <span class="text-skt-blue font-semibold">Erfolgreich!</span>`;
+                fortschrittKreisKarriere.style.strokeDashoffset = 0;
+            } else {
+                // Berechne den Fortschritt zur nächsten Stufe
+                const ehInCurrentSpan = totalCurrentEh - currentTierGoal;
+                const ehSpanToNextTier = nextTierGoal - currentTierGoal;
+                
+                let fortschrittProzentKarriere = 0;
+                if (ehSpanToNextTier > 0) {
+                    fortschrittProzentKarriere = (ehInCurrentSpan / ehSpanToNextTier) * 100;
+                }
+                
+                // Aktualisiere Kreisdiagramm und Text
+                const radius = 40;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference * (1 - Math.min(fortschrittProzentKarriere, 100) / 100);
+                fortschrittKreisKarriere.style.strokeDasharray = circumference;
+                fortschrittKreisKarriere.style.strokeDashoffset = offset;
+                
+                careerProgressPercentage.textContent = `${Math.min(fortschrittProzentKarriere, 100).toFixed(1)}%`;
+                progressToNextText.textContent = `Fortschritt zum ${nextTierName}`;
+                nextMilestone.innerHTML = `Nächster Meilenstein: <span class="text-skt-blue font-semibold">${nextTierName} (${nextTierGoal} EH)</span>`;
+                
+                // Aktualisiere die Fortschrittsbalken der einzelnen Stufenkarten
+                tierProgressBars[0].style.width = `${Math.min(totalCurrentEh / tierGoals[0].goal * 100, 100)}%`;
+                if (totalCurrentEh >= tierGoals[0].goal) { tierCards[0].classList.add('active'); }
+                
+                tierProgressBars[1].style.width = `${Math.min((totalCurrentEh - tierGoals[0].goal) / (tierGoals[1].goal - tierGoals[0].goal) * 100, 100)}%`;
+                if (totalCurrentEh >= tierGoals[1].goal) { tierCards[1].classList.add('active'); }
+                
+                tierProgressBars[2].style.width = `${Math.min((totalCurrentEh - tierGoals[1].goal) / (tierGoals[2].goal - tierGoals[1].goal) * 100, 100)}%`;
+                if (totalCurrentEh >= tierGoals[2].goal) { tierCards[2].classList.add('active'); }
+            }
+
+            // Neue Logik für Mitarbeiter-Slots und Ziel-Status
+            employeeSlotsContainer.innerHTML = ''; // Löscht bestehende Slots
+            employeeGoalStatus.textContent = ''; // Löscht vorherige Nachrichten
+            
+            if (employeeGoal === 'none') {
+                employeeCountDisplay.textContent = employeeCount;
+                employeeGoalStatus.textContent = 'Karriereschritt besprechen';
+                employeeGoalStatus.classList.remove('text-skt-blue-light');
+                employeeGoalStatus.classList.add('text-skt-red-accent', 'font-semibold');
+            } else {
+                employeeGoalStatus.classList.remove('text-skt-blue-light');
+                employeeGoalStatus.classList.add('text-skt-blue-light');
+
+                const requiredMA = employeeGoal === 'BL' ? 6 : 3;
+                const filledMA = requiredMA - employeesMissing;
+
+                employeeCountDisplay.textContent = `${filledMA} / ${requiredMA} MA`;
+                employeeGoalStatus.textContent = `Ziel: ${employeeGoal}`;
+
+                for (let i = 0; i < requiredMA; i++) {
+                    const slot = document.createElement('div');
+                    slot.classList.add('employee-slot');
+                    if (i < filledMA) {
+                        slot.classList.add('filled');
+                    }
+                    employeeSlotsContainer.appendChild(slot);
+                }
+            }
+        }
+
+        // Funktion zum Abrufen und Rendern der Benutzer-Dashboard-Daten
+        async function fetchAndRenderDashboard(userName) {
+            statusMessage.textContent = 'Daten werden geladen...';
+            welcomeHeader.textContent = `Willkommen, ${userName}`;
+            statusMessage.style.display = 'block';
+
+            // Parallele Abrufe für die Performance
+            const userDataPromise = fetchUserData(userName);
+            const promotionDataPromise = fetchPromotionData(userName);
+
+            await Promise.all([userDataPromise, promotionDataPromise]);
+
+            statusMessage.style.display = 'none';
+            updateProgress();
+        }
+
+        // Funktion zum Abrufen der Haupt-Dashboard-Daten
+        async function fetchUserData(userName) {
+            // Korrigierte Query mit den Spalten B bis I
+            // B: Ziel EH, C: IST EH, D: Ziel ET, E: IST ET, F: AT Soll, G: VER, H: IST, I: Gesamt EH
+            const query = `select B, C, D, E, F, G, H, I where A = '${userName.trim()}'`;
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${sheetDataName}&tq=${encodeURIComponent(query)}`;
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                const data = JSON.parse(jsonString);
+
+                if (data.table && data.table.rows.length > 0 && data.table.rows[0].c[0] !== null) {
+                    const row = data.table.rows[0].c;
+                    // **ÄNDERUNG**: Hier werden die Werte gerundet, bevor sie in den Variablen gespeichert werden.
+                    monthlyTargetEh = Math.round(row[0]?.v || 0); // B
+                    monthlyCurrentEh = Math.round(row[1]?.v || 0); // C
+                    etSoll = Math.round(row[2]?.v || 0); // D
+                    istEt = Math.round(row[3]?.v || 0); // E
+                    atSoll = Math.round(row[4]?.v || 0); // F
+                    // Die folgenden Variablen sind nun nicht mehr relevant, werden aber trotzdem aus der Tabelle gelesen
+                    // weeklyEh = Math.round(row[2]?.v || 0); // C, wird nicht mehr benutzt
+                    // istAt = Math.round(row[6]?.v || 0); // H
+                    totalCurrentEh = Math.round(row[7]?.v || 0); // I
+                    
+                    employeeCount = 0; 
+
+                } else {
+                    console.error("Keine Daten für den angegebenen Benutzer im Datenblatt gefunden.");
+                    monthlyTargetEh = 0; monthlyCurrentEh = 0; atSoll = 0; etSoll = 0; istEt = 0; totalCurrentEh = 0; employeeCount = 0;
+                }
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten aus Google Sheets:", error);
+                monthlyTargetEh = 0; monthlyCurrentEh = 0; atSoll = 0; etSoll = 0; istEt = 0; totalCurrentEh = 0; employeeCount = 0;
+                // Zeigt eine Fehlermeldung auf dem Dashboard an
+                statusMessage.textContent = 'Fehler beim Laden der Daten. Bitte versuchen Sie es später erneut.';
+            }
+        }
+
+        // Funktion zum Abrufen der Beförderungsdaten
+        async function fetchPromotionData(userName) {
+            employeeGoal = null;
+            employeesMissing = null;
+            
+            // Abrufen der relevanten Spalten aus dem Beförderungs-Sheet
+            const query = `select A, B where A is not null`;
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${sheetPromotionsName}&tq=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                const data = JSON.parse(jsonString);
+
+                let currentSection = null;
+                const rows = data.table.rows;
+                
+                for (const row of rows) {
+                    const nameCell = row.c[0]?.v;
+                    const missingMACell = row.c[1]?.v;
+
+                    if (nameCell && typeof nameCell === 'string') {
+                        if (nameCell.includes('BL Beförderungen')) {
+                            currentSection = 'BL';
+                            continue;
+                        }
+                        if (nameCell.includes('GST Beförderungen')) {
+                            currentSection = 'GST';
+                            continue;
+                        }
+
+                        if (nameCell.toLowerCase().trim() === userName.toLowerCase().trim() && currentSection) {
+                            employeeGoal = currentSection;
+                            employeesMissing = missingMACell;
+                            break; // Benutzer gefunden, Schleife beenden
+                        }
+                    }
+                }
+                
+                // Wenn der Benutzer nicht gefunden wurde, das Ziel auf 'none' setzen
+                if (employeeGoal === null) {
+                    employeeGoal = 'none';
+                }
+
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Beförderungsdaten:", error);
+                employeeGoal = 'none';
+            }
+        }
+
+
+        // Funktion zum Abrufen der Benutzerliste und Rendern im Modal
+        async function fetchUserList() {
+            const query = `select A`;
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${sheetDataName}&tq=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                const data = JSON.parse(jsonString);
+                
+                const rawUsers = data.table.rows.map(row => row.c[0]?.v).filter(name => name);
+                
+                // Filtern nach "x"
+                const filteredUsers = rawUsers.filter(user => !user.toLowerCase().includes('x'));
+                
+                // Filtern nach "Geschäftsstelle", "Bezirksleitung", etc. am Anfang des Namens
+                const startsWithFilters = ["geschäftsstelle", "bezirksleitung", "neuer ma", "wgst", "wbl", "ga", "jgst", "summe direktion", "rd königslehner"];
+                const finalUsers = filteredUsers.filter(user => {
+                    const normalizedUser = user.toLowerCase().trim();
+                    return !startsWithFilters.some(filter => normalizedUser.startsWith(filter) || normalizedUser === filter);
+                });
+
+
+                renderUserList(finalUsers);
+
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Benutzerliste:", error);
+                userListElement.innerHTML = `<li class="text-skt-red-accent">Fehler beim Laden der Benutzerliste.</li>`;
+            }
+        }
+        
+        // Funktion zum Rendern der Benutzer in der Liste
+        function renderUserList(users) {
+            userListElement.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user;
+                // Neue Klasse für die Schriftfarbe in der Liste
+                li.classList.add('py-3', 'px-4', 'rounded-md', 'hover:bg-skt-grey-light', 'cursor-pointer', 'transition-colors', 'text-skt-blue-light');
+                li.addEventListener('click', () => {
+                    fetchAndRenderDashboard(user);
+                    userDropdown.classList.add('hidden');
+                });
+                userListElement.appendChild(li);
+            });
+        }
+        
+        // Event-Listener für den Benutzer-Auswahl-Button zum Umschalten des Dropdowns
+        userSelectButton.addEventListener('click', () => {
+            fetchUserList();
+            userDropdown.classList.toggle('hidden');
+        });
+
+        // Event-Listener, um Dropdown bei Klick außerhalb zu schließen
+        window.addEventListener('click', (event) => {
+            if (!userSelectButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        // Funktion zum Extrahieren des Benutzernamens aus der URL
+        function getUserFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            // Dekodiert den Namen, falls er Leerzeichen oder Sonderzeichen enthält
+            return user ? decodeURIComponent(user) : null;
+        }
+
+        // Daten beim Laden der Seite abrufen - Hauptfunktion
+        window.onload = () => {
+            const userFromUrl = getUserFromUrl();
+            const userToLoad = userFromUrl || initialUser;
+            fetchAndRenderDashboard(userToLoad);
+        };
+    </script>
+</body>
+</html>
