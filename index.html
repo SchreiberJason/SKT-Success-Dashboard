@@ -237,6 +237,7 @@
             <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
                 <div class="flex flex-col">
                     <h1 class="text-4xl sm:text-5xl font-bold font-times-new-roman text-white mb-2" id="welcome-header">Willkommen,</h1>
+                    <p id="career-level-display" class="text-xl font-medium text-gray-400">Karrierestufe wird geladen...</p>
                     <p class="text-lg sm:text-xl text-skt-blue-main">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
                 </div>
                 <!-- Container für den Benutzer-Button und das Dropdown-Menü -->
@@ -387,7 +388,12 @@
                     <div class="flex-grow md:w-1/2 grid grid-cols-2 gap-4 w-full">
                         <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
                             <p class="text-xs text-skt-blue-light font-bold">Erreichte EH (insgesamt)</p>
-                            <p class="text-2xl font-bold text-skt-blue mt-1"><span id="current-eh-display">0</span> EH</p>
+                            <div class="flex items-center justify-center h-full">
+                                <p id="eh-value-display" class="text-2xl font-bold text-skt-blue mt-1">
+                                    <span id="current-eh-display">0</span> EH
+                                </p>
+                                <i id="eh-checkmark" class="fas fa-check-circle text-5xl text-green-500 hidden"></i>
+                            </div>
                         </div>
                         <!-- Angepasste Mitarbeiter-Karte -->
                         <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
@@ -427,6 +433,7 @@
 
         let monthlyTargetEh = 0, monthlyCurrentEh = 0, atSoll = 0, atVer = 0, etSoll = 0, istEt = 0, totalCurrentEh = 0;
         let employeeGoal = null, employeesMissing = null, employeeCount = 0;
+        let curTier=-1, curGoal=0, nextGoal=0, nextName="";
 
         // --- DOM ELEMENTS
         const dom = {
@@ -454,6 +461,7 @@
             interviewPillsContainer: document.getElementById('interview-pills'),
             userDropdownSelect: document.getElementById('user-dropdown-select'),
             userSelectError: document.getElementById('user-select-error'),
+            careerLevelDisplay: document.getElementById('career-level-display'),
             tierCards: [
                 document.getElementById('tier-1-card'),
                 document.getElementById('tier-2-card'),
@@ -546,7 +554,7 @@
         }
 
         async function fetchUserData(userName) {
-            const query = `select B, C, D, E, F, G, H, I where A = '${userName.trim()}'`;
+            const query = `select A, B, C, D, E, F, G, H, I where A = '${userName.trim()}'`;
             const data = await fetchSheetQuery(sheetDataName, query);
             if (data && data.table.rows.length > 0 && data.table.rows[0].c) {
                 const row = data.table.rows[0].c;
@@ -558,6 +566,7 @@
                 atVer = Math.round(row[5]?.v || 0);
                 totalCurrentEh = Math.round(row[7]?.v || 0);
                 employeeCount = 0; // Wird aus Promotionsdaten bestimmt
+                userName = userName;
             } else {
                 monthlyTargetEh = monthlyCurrentEh = atSoll = atVer = etSoll = istEt = totalCurrentEh = employeeCount = 0;
                 setStatus(`Keine Daten für Benutzer "${userName}" gefunden.`, true);
@@ -582,6 +591,26 @@
                     break;
                 }
             }
+        }
+
+        function getCareerLevelTitle(userName) {
+            const nameParts = userName.split(' ');
+            const lastName = nameParts[nameParts.length - 1];
+
+            // Überprüfen, ob der Titel eine Standard-Abkürzung ist
+            if (["T1", "T2", "T3", "Junior GST"].includes(curTier)) {
+                title = curTier;
+            } else {
+                // Überprüfen auf Sonderfälle "Geschäftsstelle" und "Bezirksleitung"
+                const lowerCasePosition = position.toLowerCase();
+                
+                if (lowerCasePosition.includes("geschäftsstelle") && lowerCasePosition.includes(lastName.toLowerCase())) {
+                    title = "Geschäftsstellenleiter:in";
+                } else if (lowerCasePosition.includes("bezirksleitung") && lowerCasePosition.includes(lastName.toLowerCase())) {
+                    title = "Bezirksleiter:in";
+                }
+            }
+            return title;
         }
 
         function updateWeeklyProgress() {
@@ -686,7 +715,19 @@
 
             updateCircleProgress(dom.ehProgressCircle, 40, monthlyTargetEh > 0 ? (monthlyCurrentEh / monthlyTargetEh * 100) : 0);
             updateCircleProgress(dom.etProgressCircle, 30, atSoll > 0 ? (atVer / atSoll * 100) : 0);
-            dom.currentEhDisplay.textContent = totalCurrentEh;
+            dom.currentEhDisplay.textContent = totalCurrentEh.toLocaleString('de-DE');
+
+            const ehValueDisplay = document.getElementById('eh-value-display');
+            const ehCheckmark = document.getElementById('eh-checkmark');
+
+            if (totalCurrentEh >= 4000) {
+                ehValueDisplay.classList.add('hidden');
+                ehCheckmark.classList.remove('hidden');
+            } else {
+                ehValueDisplay.classList.remove('hidden');
+                ehCheckmark.classList.add('hidden');
+                dom.currentEhDisplay.textContent = totalCurrentEh.toLocaleString('de-DE');
+            }
 
             // Bewerbungspillen
             clearChildren(dom.interviewPillsContainer);
@@ -698,7 +739,6 @@
             }
 
             // Karrierefortschritt
-            let curTier=-1, curGoal=0, nextGoal=0, nextName="";
             if(totalCurrentEh < 1251){ curTier=0; nextGoal=1250; nextName="T2"; }
             else if(totalCurrentEh < 2501){ curTier=1; curGoal=1250; nextGoal=2500; nextName="T3"; }
             else if(totalCurrentEh < 4001){ curTier=2; curGoal=2500; nextGoal=4000; nextName="Junior GST"; }
