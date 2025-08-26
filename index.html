@@ -261,6 +261,7 @@
         let personalData = {};
         let teamData = {};
         let currentPlanningView = 'team'; // 'team' or 'personal'
+        let allUsersCache = []; // PERFORMANCE: Cache für die Benutzerliste
 
         // --- DOM ELEMENTS
         const dom = {
@@ -436,7 +437,7 @@
             if (!data) return;
             let section = null;
             for (const row of data.table.rows) {
-                const name = row[0]?.v, missing = row[1]?.v;
+                const name = row.c[0]?.v, missing = row.c[1]?.v;
                 if (!name) continue;
                 if (name.includes('BL Beförderungen')) { section='BL'; continue; }
                 if (name.includes('GST Beförderungen')) { section='GST'; continue; }
@@ -678,7 +679,6 @@
             if (team.length === 0) {
                 dom.teamCount.textContent = '0';
                 dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine Mitarbeiter in der Liste.</p>`;
-                return;
             }
 
             const { startDate, endDate } = getMonthlyCycleDates();
@@ -706,7 +706,7 @@
             });
             
             const membersData = (await Promise.all(memberDataPromises)).filter(Boolean);
-            teamData = membersData.reduce((acc, member) => {
+            const teamMembersTotal = membersData.reduce((acc, member) => {
                 acc.ehGoal += member.ehGoal;
                 acc.ehCurrent += member.ehCurrent;
                 acc.etGoal += member.etGoal;
@@ -716,12 +716,22 @@
                 return acc;
             }, { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atCurrent: 0 });
 
+            // Team-Gesamtwerte berechnen, indem die persönlichen Daten des Leiters addiert werden
+            teamData = {
+                ehGoal: teamMembersTotal.ehGoal + (personalData.ehGoal || 0),
+                ehCurrent: teamMembersTotal.ehCurrent + (personalData.ehCurrent || 0),
+                etGoal: teamMembersTotal.etGoal + (personalData.etGoal || 0),
+                etCurrent: teamMembersTotal.etCurrent + (personalData.etCurrent || 0),
+                atGoal: teamMembersTotal.atGoal + (personalData.atGoal || 0),
+                atCurrent: teamMembersTotal.atCurrent + (personalData.atCurrent || 0)
+            };
+
             const activeMembers = membersData.filter(m => m.ehGoal > 0 || m.etGoal > 0);
             const passiveMembers = membersData.filter(m => m.ehGoal === 0 && m.etGoal === 0);
 
             dom.teamCount.textContent = activeMembers.length;
 
-            if (activeMembers.length === 0) {
+            if (activeMembers.length === 0 && team.length > 0) {
                  dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine aktiven Mitarbeiter in der Liste.</p>`;
             } else {
                 activeMembers.forEach(member => {
@@ -853,27 +863,56 @@
             dom.dashboardSections.classList.remove('hidden', 'opacity-0');
         }
 
-        async function populateUserDropdown(){
+        // --- PERFORMANCE UPDATE: Caching der Benutzerliste ---
+        async function getAllUsers() {
+            // Wenn der Cache bereits gefüllt ist, die Daten direkt zurückgeben
+            if (allUsersCache.length > 0) {
+                return allUsersCache;
+            }
+            // Ansonsten die Daten von Google Sheets abrufen
             const data = await fetchSheetQuery(sheetDataName, 'select A');
-            if(!data || !data.table.rows){ dom.userDropdownSelect.innerHTML='<option value="">Fehler</option>'; return; }
-            const users = filterUsers(data.table.rows.map(r=>r.c[0]?.v).filter(Boolean));
-            users.forEach(u=>{
-                const opt = document.createElement('option'); opt.value=opt.textContent=u; dom.userDropdownSelect.appendChild(opt);
+            if (!data || !data.table.rows) {
+                console.error("Fehler beim Laden der Benutzerliste.");
+                return [];
+            }
+            // Benutzer filtern und im Cache speichern
+            const users = filterUsers(data.table.rows.map(r => r.c[0]?.v).filter(Boolean));
+            allUsersCache = users;
+            return allUsersCache;
+        }
+
+        async function populateUserDropdown() {
+            const users = await getAllUsers();
+            if (users.length === 0) {
+                dom.userDropdownSelect.innerHTML = '<option value="">Fehler</option>';
+                return;
+            }
+            users.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = opt.textContent = u;
+                dom.userDropdownSelect.appendChild(opt);
             });
         }
 
-        async function fetchUserList(){
-            const data = await fetchSheetQuery(sheetDataName, 'select A');
-            if(!data || !data.table.rows){ dom.userListElement.innerHTML='<li class="text-skt-red-accent">Fehler</li>'; return; }
-            const users = filterUsers(data.table.rows.map(r=>r.c[0]?.v).filter(Boolean));
+        async function fetchUserList() {
+            const users = await getAllUsers();
+            if (users.length === 0) {
+                dom.userListElement.innerHTML = '<li class="text-skt-red-accent">Fehler</li>';
+                return;
+            }
             clearChildren(dom.userListElement);
-            users.forEach(u=>{
-                const li = document.createElement('li'); li.textContent=u;
-                li.className='py-2 px-4 hover:bg-skt-grey-light cursor-pointer transition-colors text-skt-blue-light';
-                li.addEventListener('click',()=>{fetchAndRenderDashboard(u); dom.userDropdown.classList.add('hidden');});
+            users.forEach(u => {
+                const li = document.createElement('li');
+                li.textContent = u;
+                li.className = 'py-2 px-4 hover:bg-skt-grey-light cursor-pointer transition-colors text-skt-blue-light';
+                li.addEventListener('click', () => {
+                    fetchAndRenderDashboard(u);
+                    dom.userDropdown.classList.add('hidden');
+                });
                 dom.userListElement.appendChild(li);
             });
         }
+
 
         // --- EVENTS ---
         dom.userSelectButton.addEventListener('click', ()=>{ fetchUserList(); dom.userDropdown.classList.toggle('hidden'); });
