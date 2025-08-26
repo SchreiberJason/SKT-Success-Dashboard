@@ -154,11 +154,11 @@
 
             <div id="dashboard-sections" class="space-y-12 opacity-0 transition-opacity duration-500">
                 <section id="monthly-planning-view" class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                         <h2 id="monthly-planning-title" class="text-2xl font-semibold text-skt-blue">Monatsplanung</h2>
-                        <div id="planning-view-toggle" class="view-toggle hidden space-x-2">
-                            <button id="team-view-btn" class="active">Team</button>
-                            <button id="personal-view-btn">Persönlich</button>
+                        <div id="planning-view-toggle" class="view-toggle hidden flex w-full sm:w-auto space-x-2">
+                            <button id="team-view-btn" class="active flex-1">Team</button>
+                            <button id="personal-view-btn" class="flex-1">Persönlich</button>
                         </div>
                     </div>
                     <div class="mb-8"><div id="weekly-progress-container" class="w-full flex relative h-5 mb-4 items-end"></div></div>
@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                             <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
-                                <p class="text-xs text-skt-blue-light font-bold">Mitarbeiter</p>
+                                <p class="text-xs text-skt-blue-light font-bold">Nächstes Karriereziel</p>
                                 <div id="employee-info-container" class="mt-1 flex flex-col items-center justify-center">
                                     <p class="text-2xl font-bold text-skt-blue" id="employee-count-display">0</p><p id="employee-goal-status" class="text-skt-blue-light text-sm mt-1">...</p>
                                 </div>
@@ -234,6 +234,7 @@
                 </section>
 
                 <section id="leadership-view" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+                    <div id="leader-personal-goal-container" class="mb-8"></div>
                     <h2 class="text-2xl font-semibold text-skt-blue mb-4 text-center">Dein Team-Überblick</h2>
                     <p class="text-center text-skt-blue-light mb-8">Du hast <strong id="team-count" class="text-skt-blue">0</strong> aktive Mitarbeiter in deinem Team.</p>
                     <div id="team-members-container" class="mt-6 space-y-4"></div>
@@ -260,6 +261,8 @@
 
         let personalData = {};
         let teamData = {};
+        let leaderPromotionData = []; // Cache for leader promotion goals
+        let traineePromotionData = {}; // Cache for the current user's trainee goal
         let currentPlanningView = 'team'; // 'team' or 'personal'
         let allUsersCache = []; // PERFORMANCE: Cache für die Benutzerliste
 
@@ -429,25 +432,65 @@
             }
         }
 
-        async function fetchPromotionData(userName) {
-            employeeGoal = 'none';
-            employeesMissing = 0;
+        async function fetchCurrentUserPromotionData(userName) {
+            let goal = 'none';
+            let missing = 0;
             const query = `select A, B where A is not null`;
             const data = await fetchSheetQuery(sheetPromotionsName, query);
-            if (!data) return;
+            if (!data) {
+                traineePromotionData = { goal, missing };
+                return;
+            };
             let section = null;
             for (const row of data.table.rows) {
-                const name = row.c[0]?.v, missing = row.c[1]?.v;
+                const name = row.c[0]?.v;
                 if (!name) continue;
                 if (name.includes('BL Beförderungen')) { section='BL'; continue; }
                 if (name.includes('GST Beförderungen')) { section='GST'; continue; }
                 if (name.toLowerCase().trim() === userName.toLowerCase().trim() && section) {
-                    employeeGoal = section;
-                    employeesMissing = missing;
+                    goal = section;
+                    missing = row.c[1]?.v || 0;
                     break;
                 }
             }
+            traineePromotionData = { goal, missing };
         }
+        
+        async function fetchLeaderPromotionData() {
+            const query = `select A, B, C where A is not null`; // Name, Missing MA, Start Date
+            const data = await fetchSheetQuery(sheetPromotionsName, query);
+            if (!data) {
+                leaderPromotionData = [];
+                return;
+            }
+            let isBlSection = false;
+            const promotions = [];
+            for (const row of data.table.rows) {
+                const nameCell = row.c[0];
+                if (!nameCell || !nameCell.v) continue;
+                const name = nameCell.v;
+                const nameLower = name.toLowerCase().trim();
+
+                if (nameLower.includes('bl beförderungen')) {
+                    isBlSection = true;
+                    continue;
+                }
+                if (nameLower.includes('gst beförderungen')) {
+                    isBlSection = false;
+                    continue; 
+                }
+
+                if (isBlSection && name.trim() !== "") {
+                    promotions.push({
+                        name: name.trim(),
+                        missing: row.c[1]?.v || 0,
+                        startDate: row.c[2]?.f || 'N/A'
+                    });
+                }
+            }
+            leaderPromotionData = promotions;
+        }
+
 
         function updateWeeklyProgress() {
             const { startDate, endDate } = getMonthlyCycleDates();
@@ -597,15 +640,15 @@
             clearChildren(dom.employeeSlotsContainer);
             dom.employeeGoalStatus.classList.remove('text-skt-red-accent','text-skt-blue-light','font-semibold');
 
-            if(employeeGoal === 'none'){
+            if(traineePromotionData.goal === 'none'){
                 dom.employeeCountDisplay.textContent = "N/A";
                 dom.employeeGoalStatus.textContent = 'Karriereschritt besprechen';
                 dom.employeeGoalStatus.classList.add('text-skt-red-accent','font-semibold');
             } else {
-                const required = employeeGoal === 'BL' ? 6 : 3;
-                const filled = required - employeesMissing;
+                const required = traineePromotionData.goal === 'BL' ? 6 : 3;
+                const filled = required - traineePromotionData.missing;
                 dom.employeeCountDisplay.textContent = `${filled} / ${required} MA`;
-                dom.employeeGoalStatus.textContent = `Ziel: ${employeeGoal}`;
+                dom.employeeGoalStatus.textContent = `Ziel: ${traineePromotionData.goal}`;
                 dom.employeeGoalStatus.classList.add('text-skt-blue-light');
                 for(let i=0; i < required; i++){
                     const slot=document.createElement('div'); slot.classList.add('employee-slot'); if(i < filled) slot.classList.add('filled');
@@ -670,6 +713,45 @@
             if (progressPercent >= timePercent) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
             if (progressPercent >= timePercent * 0.75) return { text: 'Erreichung gefährdet', colorClass: 'text-skt-yellow-accent' };
             return { text: 'Ziele stark gefährdet', colorClass: 'text-skt-red-accent' };
+        }
+
+        function renderLeaderPersonalGoal(userName) {
+            const container = document.getElementById('leader-personal-goal-container');
+            if (!container) return;
+            clearChildren(container);
+
+            const promotionInfo = leaderPromotionData.find(p => p.name.toLowerCase() === userName.toLowerCase().trim());
+
+            let goalHtml = '';
+            if (promotionInfo) {
+                const required = 6; // BL requires 6 MA
+                const filled = required - promotionInfo.missing;
+                let slotsHtml = '';
+                for(let i=0; i < required; i++){
+                    slotsHtml += `<div class="employee-slot ${i < filled ? 'filled' : ''}"></div>`;
+                }
+                goalHtml = `
+                    <h2 class="text-2xl font-semibold text-skt-blue mb-4 text-center">Dein nächstes Karriereziel</h2>
+                    <div class="bg-skt-grey-light rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center">
+                        <div>
+                            <p class="text-lg text-skt-blue-light font-bold">Ziel: Bezirksleitung</p>
+                            <p class="text-md text-skt-blue-light">Start im Rennen: ${promotionInfo.startDate}</p>
+                        </div>
+                        <div class="flex items-center gap-2 mt-4 sm:mt-0">
+                            <span class="text-2xl font-bold text-skt-blue">${filled}/${required} MA</span>
+                            <div class="flex space-x-1.5">${slotsHtml}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                 goalHtml = `
+                    <h2 class="text-2xl font-semibold text-skt-blue mb-4 text-center">Dein nächstes Karriereziel</h2>
+                    <div class="bg-skt-grey-light rounded-xl p-4">
+                        <p class="text-md text-skt-red-accent font-semibold text-center">Karriereschritt im nächsten PG besprechen.</p>
+                    </div>
+                `;
+            }
+            container.innerHTML = goalHtml;
         }
 
         async function renderLeadershipView(team) {
@@ -778,10 +860,35 @@
             const atPercentage = member.atGoal > 0 ? (member.atCurrent / member.atGoal * 100) : 0;
             const atColorClass = getProgressColorClass(member.atCurrent, member.atGoal, totalDaysInCycle, daysPassedInCycle);
             const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+            const memberId = member.name.replace(/[^a-zA-Z0-9]/g, '');
 
             const card = document.createElement('div');
             card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
             
+            let etDetailsHtml = '';
+            if (member.etGoal > 0) {
+                const etPercentage = (member.etCurrent / member.etGoal) * 100;
+                const etColorClass = getProgressColorClass(member.etCurrent, member.etGoal, totalDaysInCycle, daysPassedInCycle);
+                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-blue-light">${member.etCurrent} von ${member.etGoal} geführt</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${etColorClass}" style="width: ${Math.min(etPercentage, 100)}%;"></div></div></div>`;
+            } else {
+                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
+            }
+
+            const details = document.createElement('div');
+            details.className = 'team-member-details px-4';
+            details.innerHTML = `
+                <div class="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${etDetailsHtml}
+                    <div>
+                        <p class="text-sm font-semibold text-skt-blue">Analysetermine</p>
+                        <p class="text-xs text-skt-blue-light">${member.atCurrent} von ${member.atGoal} gemacht</p>
+                        <div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1">
+                            <div class="h-full ${atColorClass}" style="width: ${Math.min(atPercentage, 100)}%;"></div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2" id="leader-goal-${memberId}"></div>
+                </div>`;
+
             const summary = document.createElement('div');
             summary.className = 'p-4 cursor-pointer';
             summary.innerHTML = `
@@ -807,21 +914,52 @@
                 </div>
             `;
 
-            let etDetailsHtml = '';
-            if (member.etGoal > 0) {
-                const etPercentage = (member.etCurrent / member.etGoal) * 100;
-                const etColorClass = getProgressColorClass(member.etCurrent, member.etGoal, totalDaysInCycle, daysPassedInCycle);
-                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-blue-light">${member.etCurrent} von ${member.etGoal} geführt</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${etColorClass}" style="width: ${Math.min(etPercentage, 100)}%;"></div></div></div>`;
-            } else {
-                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
-            }
-
-            const details = document.createElement('div');
-            details.className = 'team-member-details px-4';
-            details.innerHTML = `<div class="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">${etDetailsHtml}<div><p class="text-sm font-semibold text-skt-blue">Analysetermine</p><p class="text-xs text-skt-blue-light">${member.atCurrent} von ${member.atGoal} gemacht</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${atColorClass}" style="width: ${Math.min(atPercentage, 100)}%;"></div></div></div></div>`;
-
             card.appendChild(summary);
             card.appendChild(details);
+
+            // Logic to add leader promotion goal
+            if (member.position && member.position.toLowerCase().trim() !== 'trainee') {
+                const leaderGoalContainer = details.querySelector(`#leader-goal-${memberId}`);
+                const promotionInfo = leaderPromotionData.find(p => p.name.toLowerCase() === member.name.toLowerCase().trim());
+                
+                if (leaderGoalContainer) {
+                    let goalHtml = '';
+                    if (promotionInfo) {
+                        const required = 6; // BL requires 6 MA
+                        const filled = required - promotionInfo.missing;
+                        let slotsHtml = '';
+                        for(let i=0; i < required; i++){
+                            slotsHtml += `<div class="employee-slot ${i < filled ? 'filled' : ''}"></div>`;
+                        }
+
+                        goalHtml = `
+                            <div class="mt-2 pt-4 border-t border-gray-200">
+                                <p class="text-sm font-semibold text-skt-blue">Nächstes Karriereziel</p>
+                                <div class="flex justify-between items-center mt-1">
+                                    <div>
+                                        <p class="text-xs text-skt-blue-light font-bold">Ziel: Bezirksleitung</p>
+                                        <p class="text-xs text-skt-blue-light">Start im Rennen: ${promotionInfo.startDate}</p>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg font-bold text-skt-blue">${filled}/${required}</span>
+                                        <div class="flex space-x-1.5">${slotsHtml}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        goalHtml = `
+                            <div class="mt-2 pt-4 border-t border-gray-200">
+                                <p class="text-sm font-semibold text-skt-blue">Nächstes Karriereziel</p>
+                                <p class="text-xs text-skt-red-accent font-semibold mt-1">Karriereschritt im nächsten PG besprechen.</p>
+                            </div>
+                        `;
+                    }
+                    leaderGoalContainer.innerHTML = goalHtml;
+                }
+            }
+
+
             summary.addEventListener('click', (e) => { if (!e.target.closest('.switch-view-btn')) { details.classList.toggle('open'); summary.classList.toggle('open'); } });
             summary.querySelector('.switch-view-btn').addEventListener('click', (e) => { e.stopPropagation(); fetchAndRenderDashboard(e.currentTarget.dataset.username); });
             return card;
@@ -832,7 +970,11 @@
             dom.dashboardSections.classList.add('opacity-0');
             dom.welcomeHeader.textContent=`Willkommen, ${userName}`;
             
-            await Promise.all([fetchUserData(userName), fetchPromotionData(userName)]);
+            await Promise.all([
+                fetchUserData(userName), 
+                fetchCurrentUserPromotionData(userName),
+                fetchLeaderPromotionData()
+            ]);
             
             if (dom.statusText.textContent.toLowerCase().includes('fehler')) {
                 dom.dashboardSections.classList.add('hidden');
@@ -846,6 +988,9 @@
                 dom.planningViewToggle.classList.remove('hidden');
                 dom.employeeView.classList.add('hidden');
                 dom.leadershipView.classList.remove('hidden');
+                
+                renderLeaderPersonalGoal(userName);
+                
                 const teamMembers = await findTeamMembers(userName);
                 await renderLeadershipView(teamMembers);
                 updateMonthlyPlanningView(teamData);
@@ -856,7 +1001,6 @@
                 dom.employeeView.classList.remove('hidden');
                 updateMonthlyPlanningView(personalData);
                 updateEmployeeCareerView();
-                dom.monthlyPlanningTitle.textContent = "Deine Monatsplanung";
             }
 
             setStatus('');
