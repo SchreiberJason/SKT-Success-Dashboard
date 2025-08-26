@@ -19,6 +19,7 @@
             --color-accent-green: #27ae60;
             --color-accent-red: #FF6347;
             --color-accent-yellow: #f1c40f;
+            --color-accent-gold: #d4af37;
         }
 
         .bg-skt-blue { background-color: var(--color-skt-blue); }
@@ -37,381 +38,208 @@
         .bg-skt-red-accent { background-color: var(--color-accent-red); }
         .text-skt-yellow-accent { color: var(--color-accent-yellow); }
         .bg-skt-yellow-accent { background-color: var(--color-accent-yellow); }
+        .text-gold { color: var(--color-accent-gold); }
         
-        /* Setzen der Schriftart für das gesamte Dashboard auf eine serifenlose Schriftart, wie in der Liste angegeben */
         body {
-            font-family: sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--color-skt-grey-light);
         }
 
-        /* Spezieller Stil für die Überschrift mit Times New Roman */
         .font-times-new-roman {
             font-family: "Times New Roman", Times, serif;
         }
         
-        /* Stile für den Fortschrittskreis */
-        .progress-circle {
-            transform: rotate(-90deg);
-        }
-        .progress-circle .bg-circle {
-            fill: none;
-            stroke: var(--color-skt-grey-medium);
-            stroke-width: 10;
-        }
-        .progress-circle .progress-arc {
-            fill: none;
-            stroke: var(--color-accent-green);
-            stroke-width: 10;
-            transition: stroke-dashoffset 0.7s ease-out;
-            stroke-linecap: round;
-        }
+        .progress-circle { transform: rotate(-90deg); }
+        .progress-circle .bg-circle { fill: none; stroke: var(--color-skt-grey-medium); stroke-width: 10; }
+        .progress-circle .progress-arc { fill: none; stroke: var(--color-accent-green); stroke-width: 10; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
 
-        /* Neue, dezentere Stile für das Monatsplanungs-Kreisdiagramm */
-        .progress-circle-monthly {
-            transform: rotate(-90deg);
-        }
-        .progress-circle-monthly .bg-circle {
-            fill: none;
-            stroke: #e2e8f0;
-            stroke-width: 8; /* Dezenter */
-        }
-        .progress-circle-monthly .progress-arc-eh {
-            fill: none;
-            stroke: var(--color-accent-green);
-            stroke-width: 10; /* Etwas breiter für EH */
-            transition: stroke-dashoffset 0.7s ease-out;
-            stroke-linecap: round;
-        }
-        .progress-circle-monthly .progress-arc-et {
-            fill: none;
-            stroke: var(--color-skt-blue-main);
-            stroke-width: 7; /* Etwas dünner für ET */
-            transition: stroke-dashoffset 0.7s ease-out;
-            stroke-linecap: round;
-        }
+        .progress-circle-monthly { transform: rotate(-90deg); }
+        .progress-circle-monthly .bg-circle { fill: none; stroke: #e2e8f0; stroke-width: 8; }
+        .progress-circle-monthly .progress-arc-eh { fill: none; stroke: var(--color-accent-green); stroke-width: 10; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
+        .progress-circle-monthly .progress-arc-et { fill: none; stroke: var(--color-skt-blue-main); stroke-width: 7; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
 
-        /* Stile für die Karrierestufen-Karten */
-        .tier-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid transparent; /* Standard-Transparenter Rand */
-        }
-        .tier-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-        }
-        /* Aktive Stufe wird jetzt mit dem grünen Akzent umrandet */
-        .tier-card.active {
-            border: 2px solid var(--color-accent-green);
-        }
+        .tier-card { background-color: white; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; border: 2px solid transparent; }
+        .tier-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); }
+        .tier-card.active { border: 2px solid var(--color-accent-green); }
         
-        /* Stile für Mitarbeiter-Slots */
-        .employee-slot {
-            width: 20px;
-            height: 20px;
-            background-color: var(--color-skt-grey-medium);
-            border-radius: 50%;
-            transition: background-color 0.3s ease-out;
-            border: 1px solid var(--color-skt-grey-medium);
-        }
-        .employee-slot.filled {
-            background-color: var(--color-accent-green);
-        }
+        .employee-slot { width: 20px; height: 20px; background-color: var(--color-skt-grey-medium); border-radius: 50%; transition: background-color 0.3s ease-out; border: 1px solid var(--color-skt-grey-medium); }
+        .employee-slot.filled { background-color: var(--color-accent-green); }
         
-        /* Stile für das Dropdown-Menü */
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            z-index: 50;
-            width: 200px;
-            margin-top: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .user-list li {
-            padding: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.2s;
-        }
-        .user-list li:hover {
-            background-color: #f5f5f5;
-        }
-        .user-list li:last-child {
-            border-bottom: none;
-        }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); z-index: 50; width: 200px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
         
-        .progress-bar-container {
-            width: 100%;
-            background-color: var(--color-skt-grey-medium);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 0.5rem;
-        }
+        .week-divider { position: absolute; height: calc(100% + 0.25rem); top: -0.125rem; width: 2px; background-color: #e2e8f0; z-index: 10; }
+        .start-end-divider { position: absolute; height: calc(100% + 0.25rem); top: -0.125rem; width: 2px; background-color: #e2e8f0; z-index: 10; }
+        .centered-date-label { position: absolute; bottom: -1.25rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: var(--color-skt-blue-light); white-space: nowrap; z-index: 30; }
 
-        .progress-bar {
-            height: 100%;
-            transition: width 0.7s ease-out;
-            border-radius: 4px;
-        }
+        .loader { border: 5px solid var(--color-skt-grey-light); border-top: 5px solid var(--color-skt-blue-main); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        [data-tooltip] { position: relative; cursor: help; }
+        [data-tooltip]::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px); background-color: var(--color-skt-blue); color: white; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; z-index: 100; }
+        [data-tooltip]:hover::after { opacity: 1; visibility: visible; }
+
+        .team-member-details { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; padding-top: 0; padding-bottom: 0; }
+        .team-member-details.open { max-height: 500px; padding-top: 1rem; padding-bottom: 1rem; }
+        .details-grid { border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem; }
+        .chevron-icon { transition: transform 0.3s ease-in-out; }
+        .open .chevron-icon { transform: rotate(180deg); }
         
-        /* Neuer Stil für die vertikalen Linien zwischen den Wochen */
-        .week-divider {
-            position: absolute;
-            height: calc(100% + 0.25rem); /* Kürzere Linie, jetzt halb so lang */
-            top: -0.125rem;
-            width: 2px;
-            background-color: #e2e8f0; /* Dezente graue Linie */
-            z-index: 10;
-        }
-        
-        /* Stil für die vertikalen Linien am Anfang und Ende des Balkens (jetzt wie die Wochen-Trenner) */
-        .start-end-divider {
-            position: absolute;
-            height: calc(100% + 0.25rem); /* Kürzere Linie, jetzt halb so lang */
-            top: -0.125rem;
-            width: 2px;
-            background-color: #e2e8f0;
-            z-index: 10;
-        }
-        
-        /* Stil für das zentrierte Datums-Label mit größerem Abstand */
-        .centered-date-label {
-            position: absolute;
-            bottom: -1.25rem; /* Größerer Abstand */
-            text-align: center;
-            font-size: 0.75rem;
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details > summary::before { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; margin-right: 0.5rem; transition: transform 0.3s ease-in-out; }
+        details[open] > summary::before { transform: rotate(180deg); }
+
+        /* Stile für den Ansicht-Umschalter */
+        .view-toggle button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid transparent;
             font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+        .view-toggle button.active {
+            background-color: var(--color-skt-blue);
+            color: white;
+            border-color: var(--color-skt-blue);
+        }
+        .view-toggle button:not(.active) {
+            background-color: var(--color-skt-grey-light);
             color: var(--color-skt-blue-light);
-            white-space: nowrap;
-            z-index: 30;
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-skt-blue">
-    <!-- Neuer Auswahlbereich für Benutzer -->
+    <!-- Auswahlbereich für Benutzer -->
     <div id="user-select-screen" class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
         <div class="w-full max-w-sm bg-white p-8 rounded-2xl shadow-xl border border-gray-200 text-center transform transition-transform duration-300 hover:scale-105">
-    
             <div class="mb-6">
                 <h1 class="text-3xl font-extrabold text-skt-blue leading-tight">Willkommen zurück!</h1>
                 <p class="text-gray-500 mt-2">Wähle deinen Namen, um fortzufahren.</p>
             </div>
-
             <div class="mb-6">
                 <div class="relative">
                     <select id="user-dropdown-select" class="block w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-lg text-gray-700 appearance-none transition-colors duration-200 focus:border-skt-blue-main focus:ring-2 focus:ring-skt-blue-main focus:outline-none pr-10 cursor-pointer">
                         <option value="">Benutzer wählen ...</option>
-                        <!-- Benutzer werden hier dynamisch eingefügt -->
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     </div>
                 </div>
             </div>
-    
-            <button id="start-dashboard-btn" class="w-full bg-skt-blue text-white font-semibold py-3 rounded-xl hover:bg-skt-blue-light transition-colors duration-200 shadow-md transform hover:-translate-y-0.5 active:translate-y-0 text-lg">
-                Dashboard laden
-            </button>
-    
+            <button id="start-dashboard-btn" class="w-full bg-skt-blue text-white font-semibold py-3 rounded-xl hover:bg-skt-blue-light transition-colors duration-200 shadow-md transform hover:-translate-y-0.5 active:translate-y-0 text-lg">Dashboard laden</button>
             <p id="user-select-error" class="text-red-600 mt-4 h-5 text-sm"></p>
         </div>
     </div>
 
-    <!-- Dashboard-Container, initial ausgeblendet -->
+    <!-- Dashboard-Container -->
     <div id="dashboard-content" class="hidden flex-col min-h-screen">
-        <!-- Begrüßungs-Banner -->
         <header class="w-full p-8 md:p-12 bg-skt-blue relative rounded-b-3xl">
             <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
                 <div class="flex flex-col">
                     <h1 class="text-4xl sm:text-5xl font-bold font-times-new-roman text-white mb-2" id="welcome-header">Willkommen,</h1>
-                    <p class="text-lg sm:text-xl text-skt-blue-main">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
+                    <p id="user-position" class="text-lg text-gold font-bold"></p>
+                    <p class="text-lg sm:text-xl text-white mt-2">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
                 </div>
-                <!-- Container für den Benutzer-Button und das Dropdown-Menü -->
                 <div class="relative mt-4 sm:mt-0">
-                    <!-- Neuer Benutzer-Button -->
-                    <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors">
-                        Benutzer
-                    </button>
-                    <!-- Dropdown-Menü -->
-                    <div id="user-dropdown" class="dropdown-menu hidden">
-                        <ul id="user-list" class="user-list">
-                            <!-- Benutzer werden hier dynamisch eingefügt -->
-                        </ul>
-                    </div>
+                    <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors">Benutzer wechseln</button>
+                    <div id="user-dropdown" class="dropdown-menu hidden"><ul id="user-list" class="user-list"></ul></div>
                 </div>
             </div>
         </header>
 
-        <!-- Hauptbereich mit Karrieredaten und Zielen -->
         <main class="flex flex-col w-full max-w-7xl mx-auto flex-grow p-6 md:p-8 space-y-12">
-            
-            <!-- Status- und Ladeanzeige -->
-            <div id="status-message" class="text-center text-lg font-semibold text-skt-blue mt-6">Daten werden geladen...</div>
+            <div id="status-message" class="flex flex-col items-center justify-center text-center text-lg font-semibold text-skt-blue mt-6">
+                <div class="loader mb-4"></div><p id="status-text">Daten werden geladen...</p>
+            </div>
 
-            <!-- Sektion: Monatsplanung - NEUES DESIGN -->
-            <section class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-                <h2 class="text-2xl font-semibold text-skt-blue mb-6 text-center">Deine Monatsplanung</h2>
-                
-                <!-- Sektion: Monatsfortschritt -->
-                <div class="mb-8">
-                    <!-- Container für die neue Wochen-Visualisierung -->
-                    <div id="weekly-progress-container" class="w-full flex relative h-5 mb-4 items-end">
-                        <!-- Inhalt wird dynamisch über JavaScript eingefügt -->
+            <div id="dashboard-sections" class="space-y-12 opacity-0 transition-opacity duration-500">
+                <section id="monthly-planning-view" class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="monthly-planning-title" class="text-2xl font-semibold text-skt-blue">Monatsplanung</h2>
+                        <div id="planning-view-toggle" class="view-toggle hidden space-x-2">
+                            <button id="team-view-btn" class="active">Team</button>
+                            <button id="personal-view-btn">Persönlich</button>
+                        </div>
                     </div>
-                </div>
+                    <div class="mb-8"><div id="weekly-progress-container" class="w-full flex relative h-5 mb-4 items-end"></div></div>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                        <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-sm max-h-sm">
+                            <svg class="progress-circle-monthly w-full h-full" viewBox="0 0 100 100">
+                                <circle class="bg-circle" cx="50" cy="50" r="40"></circle><circle class="bg-circle" cx="50" cy="50" r="30"></circle>
+                                <circle class="progress-arc-eh" cx="50" cy="50" r="40" id="progress-circle-eh"></circle><circle class="progress-arc-et" cx="50" cy="50" r="30" id="progress-circle-et"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
+                                <p class="text-3xl font-bold text-skt-green-accent" id="eh-percentage-text">0%</p><p class="text-sm text-gray-500">Einheiten</p>
+                                <div class="mt-4"><p class="text-xl font-bold text-skt-blue-main" id="et-percentage-text">0%</p><p class="text-xs text-gray-500">Termine</p></div>
+                            </div>
+                        </div>
+                        <div class="flex-grow md:w-1/2 flex flex-col gap-8 w-full">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                                    <p class="text-xs text-skt-blue-light font-bold" data-tooltip="Erreichte Einheiten in diesem Monat">Einheiten</p>
+                                    <p class="text-xl font-bold text-skt-blue mt-1"><span id="eh-current">0</span>/<span id="eh-goal">0</span></p><p class="text-xs text-gray-500 mt-1">Einheiten erreicht.</p>
+                                </div>
+                                <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                                    <p class="text-xs text-skt-blue-light font-bold" data-tooltip="Vereinbarte Analysetermine">Termine</p>
+                                    <p class="text-xl font-bold text-skt-blue mt-1"><span id="at-ver-display">0</span>/<span id="at-soll-display">0</span></p><p class="text-xs text-gray-500 mt-1">Analysen gemacht.</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md">
+                                <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                                    <p class="text-sm text-skt-blue-light font-bold" data-tooltip="Geführte Bewerbungsgespräche">Bewerbungsgespräche</p>
+                                    <p class="text-xl font-bold text-skt-blue mt-2 sm:mt-0"><span id="et-current">0</span>/<span id="et-goal">0</span></p>
+                                </div>
+                                <div id="interview-pills" class="flex flex-wrap gap-2 items-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Sektion: Monatsziel-Fortschritt (Kreisdiagramme & Daten) -->
-                <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-                    <!-- Kombiniertes Kreisdiagramm (links) -->
-                    <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-sm max-h-sm">
-                        <svg class="progress-circle-monthly w-full h-full" viewBox="0 0 100 100">
-                            <!-- Hintergrund-Kreis für Einheiten (größerer Kreis) -->
-                            <circle class="bg-circle" cx="50" cy="50" r="40"></circle>
-                            <!-- Hintergrund-Kreis für ETs (kleinerer Kreis) -->
-                            <circle class="bg-circle" cx="50" cy="50" r="30"></circle>
+                <section id="employee-view" class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+                    <h2 class="text-2xl font-semibold text-skt-blue mb-6 text-center">Dein aktueller Fortschritt</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div id="tier-1-card" class="tier-card active"><h3 class="text-2xl font-bold mb-2 text-skt-blue">T1</h3><p class="text-sm text-skt-blue-light mb-4">0 EH</p><div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden"><div id="tier-1-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 100%;"></div></div></div>
+                        <div id="tier-2-card" class="tier-card"><h3 class="text-2xl font-bold mb-2 text-skt-blue">T2</h3><p class="text-sm text-skt-blue-light mb-4">1.250 EH</p><div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden"><div id="tier-2-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div></div></div>
+                        <div id="tier-3-card" class="tier-card"><h3 class="text-2xl font-bold mb-2 text-skt-blue">T3</h3><p class="text-sm text-skt-blue-light mb-4">2.500 EH</p><div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden"><div id="tier-3-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div></div></div>
+                        <div id="tier-gst-card" class="tier-card"><h3 class="text-2xl font-bold mb-2 text-skt-blue">Junior GST</h3><p class="text-sm text-skt-blue-light mb-4">4.000 EH</p><div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden"><div id="tier-gst-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div></div></div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-8 mt-8">
+                        <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-96 max-h-96">
+                            <svg class="progress-circle w-full h-full" viewBox="0 0 100 100">
+                                <circle class="bg-circle" cx="50" cy="50" r="40"></circle><circle class="progress-arc" cx="50" cy="50" r="40" id="progress-circle-career"></circle>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
+                                <p id="career-progress-percentage" class="text-5xl font-bold text-skt-blue">0%</p><p class="text-sm text-skt-blue-light mt-1" id="progress-to-next-text">Fortschritt zum ...</p>
+                            </div>
+                        </div>
+                        <div class="flex-grow md:w-1/2 grid grid-cols-2 gap-4 w-full">
+                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                                <p class="text-xs text-skt-blue-light font-bold" data-tooltip="Deine gesamten erreichten Einheiten">Erreichte EH (insgesamt)</p>
+                                <div class="flex items-center justify-center h-full">
+                                    <p id="eh-value-display" class="text-2xl font-bold text-skt-blue mt-1"><span id="current-eh-display">0</span> EH</p><i id="eh-checkmark" class="fas fa-check-circle text-5xl text-green-500 hidden"></i>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                                <p class="text-xs text-skt-blue-light font-bold">Mitarbeiter</p>
+                                <div id="employee-info-container" class="mt-1 flex flex-col items-center justify-center">
+                                    <p class="text-2xl font-bold text-skt-blue" id="employee-count-display">0</p><p id="employee-goal-status" class="text-skt-blue-light text-sm mt-1">...</p>
+                                </div>
+                                <div id="employee-slots-container" class="flex space-x-2 mt-2"></div>
+                            </div>
+                            <div class="p-4 col-span-2 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
+                                <p id="next-milestone" class="text-skt-blue-light text-sm font-bold">Nächster Meilenstein: <span class="text-skt-blue font-semibold">...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                            <!-- Fortschritts-Kreis für Einheiten -->
-                            <circle class="progress-arc-eh" cx="50" cy="50" r="40" id="progress-circle-eh"></circle>
-                            <!-- Fortschritts-Kreis für ETs -->
-                            <circle class="progress-arc-et" cx="50" cy="50" r="30" id="progress-circle-et"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
-                            <p class="text-3xl font-bold text-skt-green-accent" id="eh-percentage-text">0%</p>
-                            <p class="text-sm text-gray-500">Einheiten</p>
-                            <div class="mt-4">
-                                <p class="text-xl font-bold text-skt-blue-main" id="et-percentage-text">0%</p>
-                                <p class="text-xs text-gray-500">Termine</p>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <!-- Datenkarten (rechts) -->
-                    
-                    <div class="flex-grow md:w-1/2 flex flex-col gap-8 w-full">
-                        <!-- Datenkarten -->
-                        <!-- Anpassen des Rasters, um die verbleibenden Elemente zu zentrieren und gleichmäßig zu verteilen -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
-                                <p class="text-xs text-skt-blue-light font-bold">Einheiten</p>
-                                <p class="text-xl font-bold text-skt-blue mt-1"><span id="eh-current">0</span>/<span id="eh-goal">0</span></p>
-                                <p class="text-xs text-gray-500 mt-1">Einheiten hast du schon erreicht.</p>
-                            </div>
-                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
-                                <p class="text-xs text-skt-blue-light font-bold">Termine</p>
-                                <p class="text-xl font-bold text-skt-blue mt-1"><span id="at-ver-display">0</span>/<span id="at-soll-display">0</span></p>
-                                <p class="text-xs text-gray-500 mt-1">Analysen hast du schon gemacht.</p>
-                            </div>
-                        </div>
-                        <!-- Bewerbungsgesprächs-Visualisierung -->
-                        <div class="p-4 bg-skt-grey-light rounded-xl shadow-md">
-                            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                                <p class="text-sm text-skt-blue-light font-bold">Bewerbungsgespräche</p>
-                                <p class="text-xl font-bold text-skt-blue mt-2 sm:mt-0"><span id="et-current">0</span>/<span id="et-goal">0</span></p>
-                            </div>
-                            <div id="interview-pills" class="flex flex-wrap gap-2 items-center">
-                                <!-- Pillen werden per JS eingefügt -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-
-            <!-- Sektion: Aktueller Fortschritt -->
-            <section class="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-                <h2 class="text-2xl font-semibold text-skt-blue mb-6 text-center">Dein aktueller Fortschritt</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <!-- T1-Karte -->
-                    <div id="tier-1-card" class="tier-card active">
-                        <h3 class="text-2xl font-bold mb-2 text-skt-blue">T1</h3>
-                        <p class="text-sm text-skt-blue-light mb-4">0 EH</p>
-                        <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
-                            <div id="tier-1-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 100%;"></div>
-                        </div>
-                    </div>
-                    <!-- T2-Karte -->
-                    <div id="tier-2-card" class="tier-card">
-                        <h3 class="text-2xl font-bold mb-2 text-skt-blue">T2</h3>
-                        <p class="text-sm text-skt-blue-light mb-4">1.250 EH</p>
-                        <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
-                            <div id="tier-2-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <!-- T3-Karte -->
-                    <div id="tier-3-card" class="tier-card">
-                        <h3 class="text-2xl font-bold mb-2 text-skt-blue">T3</h3>
-                        <p class="text-sm text-skt-blue-light mb-4">2.500 EH</p>
-                        <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
-                            <div id="tier-3-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <!-- Junior GST-Karte -->
-                    <div id="tier-gst-card" class="tier-card">
-                        <h3 class="text-2xl font-bold mb-2 text-skt-blue">Junior GST</h3>
-                        <p class="text-sm text-skt-blue-light mb-4">4.000 EH</p>
-                        <div class="w-full bg-skt-grey-light h-2 rounded-full overflow-hidden">
-                            <div id="tier-gst-progress" class="h-full bg-skt-green-accent transition-all duration-700 ease-out" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                    <!-- Kreisdiagramm (links) -->
-                    <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-96 max-h-96">
-                        <svg class="progress-circle w-full h-full" viewBox="0 0 100 100">
-                            <!-- Hintergrund-Kreis -->
-                            <circle class="bg-circle" cx="50" cy="50" r="40"></circle>
-                            <!-- Fortschritts-Kreis -->
-                            <circle class="progress-arc" cx="50" cy="50" r="40" id="progress-circle-career"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
-                            <!-- Der Text wird jetzt dynamisch aktualisiert, um den Fortschritt zur nächsten Stufe anzuzeigen -->
-                            <p id="career-progress-percentage" class="text-5xl font-bold text-skt-blue">0%</p>
-                            <p class="text-sm text-skt-blue-light mt-1" id="progress-to-next-text">Fortschritt zum ...</p>
-                        </div>
-                    </div>
-        
-                    <!-- Detaillierte Infos (rechts) -->
-                    <div class="flex-grow md:w-1/2 grid grid-cols-2 gap-4 w-full">
-                        <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
-                            <p class="text-xs text-skt-blue-light font-bold">Erreichte EH (insgesamt)</p>
-                            <div class="flex items-center justify-center h-full">
-                                <p id="eh-value-display" class="text-2xl font-bold text-skt-blue mt-1">
-                                    <span id="current-eh-display">0</span> EH
-                                </p>
-                                <i id="eh-checkmark" class="fas fa-check-circle text-5xl text-green-500 hidden"></i>
-                            </div>
-                        </div>
-                        <!-- Angepasste Mitarbeiter-Karte -->
-                        <div class="p-4 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
-                            <p class="text-xs text-skt-blue-light font-bold">Mitarbeiter</p>
-                            <div id="employee-info-container" class="mt-1 flex flex-col items-center justify-center">
-                                <!-- Dynamische Inhalte für Mitarbeiter und Ziel werden hier eingefügt -->
-                                <p class="text-2xl font-bold text-skt-blue" id="employee-count-display">0</p>
-                                <p id="employee-goal-status" class="text-skt-blue-light text-sm mt-1">...</p>
-                            </div>
-                            <div id="employee-slots-container" class="flex space-x-2 mt-2">
-                                <!-- Dynamische Mitarbeiter-Slots werden hier eingefügt -->
-                            </div>
-                        </div>
-                        <div class="p-4 col-span-2 bg-skt-grey-light rounded-xl shadow-md flex flex-col items-center justify-center text-center">
-                            <p id="next-milestone" class="text-skt-blue-light text-sm font-bold">Nächster Meilenstein: <span class="text-skt-blue font-semibold">...</span></p>
-                        </div>
-                    </div>
-                </div>
-            </section>      
+                <section id="leadership-view" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+                    <h2 class="text-2xl font-semibold text-skt-blue mb-4 text-center">Dein Team-Überblick</h2>
+                    <p class="text-center text-skt-blue-light mb-8">Du hast <strong id="team-count" class="text-skt-blue">0</strong> aktive Mitarbeiter in deinem Team.</p>
+                    <div id="team-members-container" class="mt-6 space-y-4"></div>
+                    <div id="passive-members-section" class="mt-8"></div>
+                </section>
+            </div>      
         </main>
     </div>
 
@@ -430,13 +258,22 @@
             { name: "Junior GST", goal: 4001 }
         ];
 
-        let monthlyTargetEh = 0, monthlyCurrentEh = 0, atSoll = 0, atVer = 0, etSoll = 0, istEt = 0, totalCurrentEh = 0;
-        let employeeGoal = null, employeesMissing = null, employeeCount = 0;
+        let personalData = {};
+        let teamData = {};
+        let currentPlanningView = 'team'; // 'team' or 'personal'
 
         // --- DOM ELEMENTS
         const dom = {
             welcomeHeader: document.getElementById('welcome-header'),
+            userPosition: document.getElementById('user-position'),
             statusMessage: document.getElementById('status-message'),
+            statusText: document.getElementById('status-text'),
+            dashboardSections: document.getElementById('dashboard-sections'),
+            employeeView: document.getElementById('employee-view'),
+            leadershipView: document.getElementById('leadership-view'),
+            teamCount: document.getElementById('team-count'),
+            teamMembersContainer: document.getElementById('team-members-container'),
+            passiveMembersSection: document.getElementById('passive-members-section'),
             fortschrittKreisKarriere: document.getElementById('progress-circle-career'),
             careerProgressPercentage: document.getElementById('career-progress-percentage'),
             progressToNextText: document.getElementById('progress-to-next-text'),
@@ -473,14 +310,20 @@
             ],
             userSelectButton: document.getElementById('user-select-button'),
             userDropdown: document.getElementById('user-dropdown'),
-            userListElement: document.getElementById('user-list')
+            userListElement: document.getElementById('user-list'),
+            monthlyPlanningTitle: document.getElementById('monthly-planning-title'),
+            planningViewToggle: document.getElementById('planning-view-toggle'),
+            teamViewBtn: document.getElementById('team-view-btn'),
+            personalViewBtn: document.getElementById('personal-view-btn'),
         };
 
         // --- HILFSFUNKTIONEN ---
         function setStatus(msg, isError = false) {
-            dom.statusMessage.textContent = msg;
-            dom.statusMessage.style.color = isError ? 'red' : '';
-            dom.statusMessage.style.display = msg ? 'block' : 'none';
+            dom.statusText.textContent = msg;
+            dom.statusMessage.style.color = isError ? 'var(--color-accent-red)' : '';
+            dom.statusMessage.style.display = msg ? 'flex' : 'none';
+            const loader = dom.statusMessage.querySelector('.loader');
+            if (loader) loader.style.display = isError ? 'none' : 'block';
         }
 
         function clearChildren(el) { while(el.firstChild) el.removeChild(el.firstChild); }
@@ -493,6 +336,20 @@
             svgElement.style.strokeDashoffset = offset;
         }
 
+        function animateValue(element, start, end, duration, isLocaleString = true) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = isLocaleString ? value.toLocaleString('de-DE') : value;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         function getFirstWeekdayOfMonth(year, month, weekday) {
             const date = new Date(year, month, 1);
             while (date.getDay() !== weekday) date.setDate(date.getDate() + 1);
@@ -503,10 +360,10 @@
             const today = new Date();
             const year = today.getFullYear();
             const month = today.getMonth();
-            let startDate = getFirstWeekdayOfMonth(year, month, 4); // Donnerstag
+            let startDate = getFirstWeekdayOfMonth(year, month, 4);
             let nextMonth = (month + 1) % 12;
             let nextYear = year + Math.floor((month + 1)/12);
-            let endDate = getFirstWeekdayOfMonth(nextYear, nextMonth, 3); // Mittwoch
+            let endDate = getFirstWeekdayOfMonth(nextYear, nextMonth, 3);
             if (endDate.getDate() === 1) endDate.setDate(endDate.getDate()+7);
             return { startDate, endDate };
         }
@@ -529,7 +386,7 @@
         function filterUsers(rawUsers) {
             return rawUsers.filter(u => {
                 const n = u.toLowerCase().trim();
-                return !n.includes('x') && !USER_FILTER_PREFIXES.some(f => n.startsWith(f) || n === f);
+                return n !== 'x' && !USER_FILTER_PREFIXES.some(f => n.startsWith(f) || n === f);
             });
         }
 
@@ -551,20 +408,22 @@
         }
 
         async function fetchUserData(userName) {
-            const query = `select B, C, D, E, F, G, H, I where A = '${userName.trim()}'`;
+            const query = `select B, C, D, E, F, G, H, I, J where A = '${userName.trim()}'`;
             const data = await fetchSheetQuery(sheetDataName, query);
             if (data && data.table.rows.length > 0 && data.table.rows[0].c) {
                 const row = data.table.rows[0].c;
-                monthlyTargetEh = Math.round(row[0]?.v || 0);
-                monthlyCurrentEh = Math.round(row[1]?.v || 0);
-                etSoll = Math.round(row[2]?.v || 0);
-                istEt = Math.round(row[3]?.v || 0);
-                atSoll = Math.round(row[4]?.v || 0);
-                atVer = Math.round(row[5]?.v || 0);
-                totalCurrentEh = Math.round(row[7]?.v || 0);
-                employeeCount = 0; // Wird aus Promotionsdaten bestimmt
+                personalData = {
+                    ehGoal: Math.round(row[0]?.v || 0),
+                    ehCurrent: Math.round(row[1]?.v || 0),
+                    etGoal: Math.round(row[2]?.v || 0),
+                    etCurrent: Math.round(row[3]?.v || 0),
+                    atGoal: Math.round(row[4]?.v || 0),
+                    atCurrent: Math.round(row[5]?.v || 0),
+                    totalCurrentEh: Math.round(row[7]?.v || 0),
+                    position: row[8]?.v || "N/A"
+                };
             } else {
-                monthlyTargetEh = monthlyCurrentEh = atSoll = atVer = etSoll = istEt = totalCurrentEh = employeeCount = 0;
+                personalData = { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atCurrent: 0, totalCurrentEh: 0, position: "N/A" };
                 setStatus(`Keine Daten für Benutzer "${userName}" gefunden.`, true);
             }
         }
@@ -577,7 +436,7 @@
             if (!data) return;
             let section = null;
             for (const row of data.table.rows) {
-                const name = row.c[0]?.v, missing = row.c[1]?.v;
+                const name = row[0]?.v, missing = row[1]?.v;
                 if (!name) continue;
                 if (name.includes('BL Beförderungen')) { section='BL'; continue; }
                 if (name.includes('GST Beförderungen')) { section='GST'; continue; }
@@ -592,20 +451,18 @@
         function updateWeeklyProgress() {
             const { startDate, endDate } = getMonthlyCycleDates();
             const today = new Date();
-            dom.weeklyProgressContainer.innerHTML = ''; // Container leeren
+            clearChildren(dom.weeklyProgressContainer);
 
             const totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
             const daysInAWeek = 7;
             const totalWeeks = Math.ceil(totalDays / daysInAWeek);
             const dateOptions = { day: '2-digit', month: '2-digit' };
 
-            // Startlinie links
             const startDivider = document.createElement('div');
             startDivider.classList.add('start-end-divider');
             startDivider.style.left = '0%';
             dom.weeklyProgressContainer.appendChild(startDivider);
 
-            // Startdatum-Label
             const startLabel = document.createElement('div');
             startLabel.classList.add('centered-date-label');
             startLabel.style.left = '0%';
@@ -613,47 +470,38 @@
             startLabel.textContent = startDate.toLocaleDateString('de-DE', dateOptions);
             dom.weeklyProgressContainer.appendChild(startLabel);
 
-            // Wochenbalken
             for (let i = 0; i < totalWeeks; i++) {
                 const weekStart = new Date(startDate.getTime() + i * daysInAWeek * 24 * 60 * 60 * 1000);
                 const weekEnd = new Date(weekStart.getTime() + daysInAWeek * 24 * 60 * 60 * 1000);
 
                 let progress = 0;
-                if (today >= weekEnd) {
-                    progress = 100;
-                } else if (today >= weekStart && today < weekEnd) {
+                if (today >= weekEnd) progress = 100;
+                else if (today >= weekStart && today < weekEnd) {
                     const daysPassed = (today - weekStart) / (1000 * 60 * 60 * 24);
                     progress = (daysPassed / daysInAWeek) * 100;
                 }
 
                 const weekDiv = document.createElement('div');
-                weekDiv.classList.add('flex-1', 'h-full', 'relative', 'p-2', 'flex', 'flex-col', 'items-center', 'z-20');
-
+                weekDiv.className = 'flex-1 h-full relative p-2 flex flex-col items-center z-20';
                 const barContainer = document.createElement('div');
-                barContainer.classList.add('w-full', 'bg-skt-grey-medium', 'h-2', 'rounded-full', 'overflow-hidden');
-
+                barContainer.className = 'w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden';
                 const bar = document.createElement('div');
-                bar.classList.add('h-full', 'bg-skt-green-accent', 'rounded-full', 'transition-all', 'duration-500');
+                bar.className = 'h-full bg-skt-green-accent rounded-full transition-all duration-500';
                 bar.style.width = `${Math.min(progress, 100)}%`;
-
                 barContainer.appendChild(bar);
                 weekDiv.appendChild(barContainer);
                 dom.weeklyProgressContainer.appendChild(weekDiv);
             }
 
-            // Linien & Mittwoche-Labels zwischen Wochen
             const weeksDivs = dom.weeklyProgressContainer.querySelectorAll('.flex-1');
             weeksDivs.forEach((div, i) => {
-                if (i === weeksDivs.length - 1) return; // letzte Woche überspringen
-
+                if (i === weeksDivs.length - 1) return;
                 const divider = document.createElement('div');
                 divider.classList.add('week-divider');
                 divider.style.left = `${(i + 1) * (100 / weeksDivs.length)}%`;
                 dom.weeklyProgressContainer.appendChild(divider);
-
                 const wednesday = new Date(startDate.getTime() + i * daysInAWeek * 24 * 60 * 60 * 1000);
-                wednesday.setDate(wednesday.getDate() + (3 - wednesday.getDay() + 7) % 7); // Mittwoch
-
+                wednesday.setDate(wednesday.getDate() + (3 - wednesday.getDay() + 7) % 7);
                 const label = document.createElement('div');
                 label.classList.add('centered-date-label');
                 label.style.left = `${(i + 1) * (100 / weeksDivs.length)}%`;
@@ -662,12 +510,10 @@
                 dom.weeklyProgressContainer.appendChild(label);
             });
 
-            // Endlinie rechts
             const endDivider = document.createElement('div');
             endDivider.classList.add('start-end-divider');
             endDivider.style.right = '0%';
             dom.weeklyProgressContainer.appendChild(endDivider);
-
             const endLabel = document.createElement('div');
             endLabel.classList.add('centered-date-label');
             endLabel.style.right = '0%';
@@ -675,50 +521,46 @@
             endLabel.textContent = endDate.toLocaleDateString('de-DE', dateOptions);
             dom.weeklyProgressContainer.appendChild(endLabel);
         }
-
-        function updateProgress() {
+        
+        function updateMonthlyPlanningView(data) {
             updateWeeklyProgress();
-
-            dom.ehCurrentDisplay.textContent = monthlyCurrentEh;
-            dom.ehGoalDisplay.textContent = monthlyTargetEh;
-            dom.etCurrentDisplay.textContent = istEt;
-            dom.etGoalDisplay.textContent = etSoll;
-            dom.atSollDisplay.textContent = atSoll;
-            dom.atVerDisplay.textContent = atVer;
+            animateValue(dom.ehCurrentDisplay, 0, data.ehCurrent, 1000, false);
+            animateValue(dom.etCurrentDisplay, 0, data.etCurrent, 1000, false);
+            animateValue(dom.atVerDisplay, 0, data.atCurrent, 1000, false);
+            dom.ehGoalDisplay.textContent = data.ehGoal;
+            dom.etGoalDisplay.textContent = data.etGoal;
+            dom.atSollDisplay.textContent = data.atGoal;
+            dom.ehPercentageText.textContent = `${Math.min(data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0, 100).toFixed(1)}%`;
+            dom.etPercentageText.textContent = `${Math.min(data.atGoal > 0 ? (data.atCurrent / data.atGoal * 100) : 0, 100).toFixed(1)}%`;
+            updateCircleProgress(dom.ehProgressCircle, 40, data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0);
+            updateCircleProgress(dom.etProgressCircle, 30, data.atGoal > 0 ? (data.atCurrent / data.atGoal * 100) : 0);
             
-            dom.ehPercentageText.textContent = `${Math.min(monthlyTargetEh > 0 ? (monthlyCurrentEh / monthlyTargetEh * 100) : 0, 100).toFixed(1)}%`;
-            dom.etPercentageText.textContent = `${Math.min(atSoll > 0 ? (atVer / atSoll * 100) : 0, 100).toFixed(1)}%`;
+            clearChildren(dom.interviewPillsContainer);
+            for(let i=0; i < data.etGoal; i++){
+                const pill = document.createElement('div');
+                pill.className = `px-3 py-1 text-white text-xs font-semibold rounded-full shadow-md ${i < data.etCurrent ? 'bg-skt-green-accent':'bg-skt-blue-light'}`;
+                pill.textContent = i + 1;
+                dom.interviewPillsContainer.appendChild(pill);
+            }
+        }
 
-            updateCircleProgress(dom.ehProgressCircle, 40, monthlyTargetEh > 0 ? (monthlyCurrentEh / monthlyTargetEh * 100) : 0);
-            updateCircleProgress(dom.etProgressCircle, 30, atSoll > 0 ? (atVer / atSoll * 100) : 0);
-            dom.currentEhDisplay.textContent = totalCurrentEh.toLocaleString('de-DE');
-
+        function updateEmployeeCareerView() {
             const ehValueDisplay = document.getElementById('eh-value-display');
             const ehCheckmark = document.getElementById('eh-checkmark');
 
-            if (totalCurrentEh >= 4000) {
+            if (personalData.totalCurrentEh >= 4000) {
                 ehValueDisplay.classList.add('hidden');
                 ehCheckmark.classList.remove('hidden');
             } else {
                 ehValueDisplay.classList.remove('hidden');
                 ehCheckmark.classList.add('hidden');
-                dom.currentEhDisplay.textContent = totalCurrentEh.toLocaleString('de-DE');
+                animateValue(dom.currentEhDisplay, 0, personalData.totalCurrentEh, 1500);
             }
 
-            // Bewerbungspillen
-            clearChildren(dom.interviewPillsContainer);
-            for(let i=0; i < etSoll; i++){
-                const pill = document.createElement('div');
-                pill.className = `px-3 py-1 text-white text-xs font-semibold rounded-full shadow-md ${i < istEt ? 'bg-skt-green-accent':'bg-skt-blue-light'}`;
-                pill.textContent = i + 1;
-                dom.interviewPillsContainer.appendChild(pill);
-            }
-
-            // Karrierefortschritt
             let curTier=-1, curGoal=0, nextGoal=0, nextName="";
-            if(totalCurrentEh < 1251){ curTier=0; nextGoal=1250; nextName="T2"; }
-            else if(totalCurrentEh < 2501){ curTier=1; curGoal=1250; nextGoal=2500; nextName="T3"; }
-            else if(totalCurrentEh < 4001){ curTier=2; curGoal=2500; nextGoal=4000; nextName="Junior GST"; }
+            if(personalData.totalCurrentEh < 1251){ curTier=0; nextGoal=1250; nextName="T2"; }
+            else if(personalData.totalCurrentEh < 2501){ curTier=1; curGoal=1250; nextGoal=2500; nextName="T3"; }
+            else if(personalData.totalCurrentEh < 4001){ curTier=2; curGoal=2500; nextGoal=4000; nextName="Junior GST"; }
             else curTier=3;
 
             dom.tierCards.forEach(c => c.classList.remove('active'));
@@ -732,32 +574,30 @@
                 dom.nextMilestone.innerHTML='Nächster Meilenstein: <span class="text-skt-blue font-semibold">Erfolgreich!</span>';
                 updateCircleProgress(dom.fortschrittKreisKarriere, 40, 100);
             } else {
-                const spanCur = totalCurrentEh - curGoal, spanNext = nextGoal - curGoal;
+                const spanCur = personalData.totalCurrentEh - curGoal, spanNext = nextGoal - curGoal;
                 const percent = spanNext > 0 ? (spanCur / spanNext * 100) : 0;
                 dom.careerProgressPercentage.textContent=`${Math.min(percent, 100).toFixed(1)}%`;
                 dom.progressToNextText.textContent=`Fortschritt zum ${nextName}`;
-                dom.nextMilestone.innerHTML=`Nächster Meilenstein: <span class="text-skt-blue font-semibold">${nextName} (${nextGoal} EH)</span>`;
+                dom.nextMilestone.innerHTML=`Nächster Meilenstein: <span class="text-skt-blue font-semibold">${nextName} (${nextGoal.toLocaleString('de-DE')} EH)</span>`;
                 updateCircleProgress(dom.fortschrittKreisKarriere, 40, percent);
 
-                // Progress Bars
-                if (dom.tierProgressBars[0]) dom.tierProgressBars[0].style.width=`${Math.min(totalCurrentEh / tierGoals[0].goal * 100, 100)}%`; 
-                if (totalCurrentEh >= tierGoals[0].goal && dom.tierCards[0]) dom.tierCards[0].classList.add('active');
+                if (dom.tierProgressBars[0]) dom.tierProgressBars[0].style.width=`${Math.min(personalData.totalCurrentEh / tierGoals[0].goal * 100, 100)}%`; 
+                if (personalData.totalCurrentEh >= tierGoals[0].goal && dom.tierCards[0]) dom.tierCards[0].classList.add('active');
                 
-                if (dom.tierProgressBars[1]) dom.tierProgressBars[1].style.width=`${Math.min(Math.max(0, totalCurrentEh - tierGoals[0].goal) / (tierGoals[1].goal - tierGoals[0].goal) * 100, 100)}%`; 
-                if (totalCurrentEh >= tierGoals[1].goal && dom.tierCards[1]) dom.tierCards[1].classList.add('active');
+                if (dom.tierProgressBars[1]) dom.tierProgressBars[1].style.width=`${Math.min(Math.max(0, personalData.totalCurrentEh - tierGoals[0].goal) / (tierGoals[1].goal - tierGoals[0].goal) * 100, 100)}%`; 
+                if (personalData.totalCurrentEh >= tierGoals[1].goal && dom.tierCards[1]) dom.tierCards[1].classList.add('active');
 
-                if (dom.tierProgressBars[2]) dom.tierProgressBars[2].style.width=`${Math.min(Math.max(0, totalCurrentEh - tierGoals[1].goal) / (tierGoals[2].goal - tierGoals[1].goal) * 100, 100)}%`; 
-                if (totalCurrentEh >= tierGoals[2].goal && dom.tierCards[2]) dom.tierCards[2].classList.add('active');
+                if (dom.tierProgressBars[2]) dom.tierProgressBars[2].style.width=`${Math.min(Math.max(0, personalData.totalCurrentEh - tierGoals[1].goal) / (tierGoals[2].goal - tierGoals[1].goal) * 100, 100)}%`; 
+                if (personalData.totalCurrentEh >= tierGoals[2].goal && dom.tierCards[2]) dom.tierCards[2].classList.add('active');
                 
                 if (dom.tierCards[curTier]) dom.tierCards[curTier].classList.add('active');
             }
 
-            // Mitarbeiter Slots
             clearChildren(dom.employeeSlotsContainer);
             dom.employeeGoalStatus.classList.remove('text-skt-red-accent','text-skt-blue-light','font-semibold');
 
             if(employeeGoal === 'none'){
-                dom.employeeCountDisplay.textContent = employeeCount;
+                dom.employeeCountDisplay.textContent = "N/A";
                 dom.employeeGoalStatus.textContent = 'Karriereschritt besprechen';
                 dom.employeeGoalStatus.classList.add('text-skt-red-accent','font-semibold');
             } else {
@@ -773,12 +613,244 @@
             }
         }
 
+        async function findTeamMembers(leaderName) {
+            const data = await fetchSheetQuery(sheetDataName, 'select A, J');
+            if (!data || !data.table.rows) return [];
+        
+            const allUsers = data.table.rows.map(r => ({
+                name: r.c[0]?.v,
+                position: r.c[1]?.v
+            })).filter(u => u.name);
+        
+            const leaderIndex = allUsers.findIndex(u => u.name.toLowerCase().trim() === leaderName.toLowerCase().trim());
+        
+            if (leaderIndex === -1) return [];
+        
+            const team = [];
+            for (let i = leaderIndex + 1; i < allUsers.length; i++) {
+                const currentUser = allUsers[i];
+                const currentNameLower = currentUser.name.toLowerCase().trim();
+                const currentPositionLower = (currentUser.position || "").toLowerCase().trim();
+        
+                if (currentPositionLower && currentPositionLower !== 'trainee') {
+                    break;
+                }
+        
+                if (currentNameLower !== 'x' && !USER_FILTER_PREFIXES.some(prefix => currentNameLower.startsWith(prefix))) {
+                    team.push(currentUser.name);
+                }
+            }
+            return team;
+        }
+        
+        function getProgressColorClass(current, goal, totalDays, daysPassed) {
+            if (goal === 0) return 'bg-skt-grey-medium';
+            const progressPercent = (current / goal) * 100;
+            if (progressPercent >= 100) return 'bg-skt-green-accent';
+
+            if (daysPassed <= 0) return 'bg-skt-green-accent';
+
+            const timePercent = (daysPassed / totalDays) * 100;
+
+            if (progressPercent >= timePercent) return 'bg-skt-green-accent';
+            if (progressPercent >= timePercent * 0.75) return 'bg-skt-yellow-accent';
+            return 'bg-skt-red-accent';
+        }
+
+        function getPrognosis(current, goal, totalDays, daysPassed) {
+            if (goal === 0) return { text: 'Keine Ziele gesetzt', colorClass: 'text-skt-blue-light' };
+            const progressPercent = (current / goal) * 100;
+            if (progressPercent >= 100) return { text: 'Ziele erreicht', colorClass: 'text-skt-green-accent' };
+
+            if (daysPassed <= 0) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
+
+            const timePercent = (daysPassed / totalDays) * 100;
+
+            if (progressPercent >= timePercent) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
+            if (progressPercent >= timePercent * 0.75) return { text: 'Erreichung gefährdet', colorClass: 'text-skt-yellow-accent' };
+            return { text: 'Ziele stark gefährdet', colorClass: 'text-skt-red-accent' };
+        }
+
+        async function renderLeadershipView(team) {
+            clearChildren(dom.teamMembersContainer);
+            clearChildren(dom.passiveMembersSection);
+
+            if (team.length === 0) {
+                dom.teamCount.textContent = '0';
+                dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine Mitarbeiter in der Liste.</p>`;
+                return;
+            }
+
+            const { startDate, endDate } = getMonthlyCycleDates();
+            const today = new Date();
+            const totalDaysInCycle = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            const daysPassedInCycle = Math.max(0, (today - startDate) / (1000 * 60 * 60 * 24));
+
+            const memberDataPromises = team.map(async (memberName) => {
+                const query = `select B, C, D, E, F, G, J where A = '${memberName.trim()}'`;
+                const data = await fetchSheetQuery(sheetDataName, query);
+                if (data && data.table.rows.length > 0) {
+                    const row = data.table.rows[0].c;
+                    return {
+                        name: memberName,
+                        ehGoal: Math.round(row[0]?.v || 0),
+                        ehCurrent: Math.round(row[1]?.v || 0),
+                        etGoal: Math.round(row[2]?.v || 0),
+                        etCurrent: Math.round(row[3]?.v || 0),
+                        atGoal: Math.round(row[4]?.v || 0),
+                        atCurrent: Math.round(row[5]?.v || 0),
+                        position: row[6]?.v || 'N/A'
+                    };
+                }
+                return null;
+            });
+            
+            const membersData = (await Promise.all(memberDataPromises)).filter(Boolean);
+            teamData = membersData.reduce((acc, member) => {
+                acc.ehGoal += member.ehGoal;
+                acc.ehCurrent += member.ehCurrent;
+                acc.etGoal += member.etGoal;
+                acc.etCurrent += member.etCurrent;
+                acc.atGoal += member.atGoal;
+                acc.atCurrent += member.atCurrent;
+                return acc;
+            }, { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atCurrent: 0 });
+
+            const activeMembers = membersData.filter(m => m.ehGoal > 0 || m.etGoal > 0);
+            const passiveMembers = membersData.filter(m => m.ehGoal === 0 && m.etGoal === 0);
+
+            dom.teamCount.textContent = activeMembers.length;
+
+            if (activeMembers.length === 0) {
+                 dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine aktiven Mitarbeiter in der Liste.</p>`;
+            } else {
+                activeMembers.forEach(member => {
+                    const card = createMemberCard(member, totalDaysInCycle, daysPassedInCycle);
+                    dom.teamMembersContainer.appendChild(card);
+                });
+            }
+
+            if (passiveMembers.length > 0) {
+                const details = document.createElement('details');
+                details.className = 'bg-white rounded-xl shadow-lg';
+                const summary = document.createElement('summary');
+                summary.className = 'p-4 font-semibold text-skt-blue cursor-pointer';
+                summary.textContent = `Passive Mitarbeiter (${passiveMembers.length})`;
+                details.appendChild(summary);
+                const container = document.createElement('div');
+                container.className = 'p-4 pt-0 space-y-3';
+                passiveMembers.forEach(member => {
+                    const passiveCard = document.createElement('div');
+                    passiveCard.className = 'p-3 bg-skt-grey-light rounded-lg flex justify-between items-center';
+                    passiveCard.innerHTML = `
+                        <div>
+                            <p class="font-bold text-skt-blue">${member.name}</p>
+                            <p class="text-sm text-skt-blue-light">${member.position}</p>
+                        </div>
+                        <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    `;
+                    passiveCard.querySelector('.switch-view-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        fetchAndRenderDashboard(e.currentTarget.dataset.username);
+                    });
+                    container.appendChild(passiveCard);
+                });
+                details.appendChild(container);
+                dom.passiveMembersSection.appendChild(details);
+            }
+        }
+
+        function createMemberCard(member, totalDaysInCycle, daysPassedInCycle) {
+            const ehPercentage = member.ehGoal > 0 ? (member.ehCurrent / member.ehGoal * 100) : 0;
+            const ehColorClass = getProgressColorClass(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+            const atPercentage = member.atGoal > 0 ? (member.atCurrent / member.atGoal * 100) : 0;
+            const atColorClass = getProgressColorClass(member.atCurrent, member.atGoal, totalDaysInCycle, daysPassedInCycle);
+            const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
+            
+            const summary = document.createElement('div');
+            summary.className = 'p-4 cursor-pointer';
+            summary.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-skt-blue text-lg">${member.name}</p>
+                        <p class="text-sm text-skt-blue-light">${member.position}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="font-semibold text-sm ${prognosis.colorClass}">${prognosis.text}</span>
+                        <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln"><i class="fas fa-eye"></i></button>
+                        <i class="fas fa-chevron-down chevron-icon text-skt-blue-light"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="flex justify-between items-baseline">
+                         <p class="text-xs text-skt-blue-light">Monatsfortschritt (EH)</p>
+                         <p class="text-xs font-semibold text-skt-blue">${member.ehCurrent} / ${member.ehGoal}</p>
+                    </div>
+                    <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden mt-1">
+                        <div class="h-full ${ehColorClass}" style="width: ${Math.min(ehPercentage, 100)}%;"></div>
+                    </div>
+                </div>
+            `;
+
+            let etDetailsHtml = '';
+            if (member.etGoal > 0) {
+                const etPercentage = (member.etCurrent / member.etGoal) * 100;
+                const etColorClass = getProgressColorClass(member.etCurrent, member.etGoal, totalDaysInCycle, daysPassedInCycle);
+                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-blue-light">${member.etCurrent} von ${member.etGoal} geführt</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${etColorClass}" style="width: ${Math.min(etPercentage, 100)}%;"></div></div></div>`;
+            } else {
+                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
+            }
+
+            const details = document.createElement('div');
+            details.className = 'team-member-details px-4';
+            details.innerHTML = `<div class="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">${etDetailsHtml}<div><p class="text-sm font-semibold text-skt-blue">Analysetermine</p><p class="text-xs text-skt-blue-light">${member.atCurrent} von ${member.atGoal} gemacht</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${atColorClass}" style="width: ${Math.min(atPercentage, 100)}%;"></div></div></div></div>`;
+
+            card.appendChild(summary);
+            card.appendChild(details);
+            summary.addEventListener('click', (e) => { if (!e.target.closest('.switch-view-btn')) { details.classList.toggle('open'); summary.classList.toggle('open'); } });
+            summary.querySelector('.switch-view-btn').addEventListener('click', (e) => { e.stopPropagation(); fetchAndRenderDashboard(e.currentTarget.dataset.username); });
+            return card;
+        }
+
         async function fetchAndRenderDashboard(userName){
             setStatus('Daten werden geladen...');
+            dom.dashboardSections.classList.add('opacity-0');
             dom.welcomeHeader.textContent=`Willkommen, ${userName}`;
+            
             await Promise.all([fetchUserData(userName), fetchPromotionData(userName)]);
+            
+            if (dom.statusText.textContent.toLowerCase().includes('fehler')) {
+                dom.dashboardSections.classList.add('hidden');
+                return;
+            }
+            
+            dom.userPosition.textContent = personalData.position;
+            const isLeader = personalData.position && personalData.position.toLowerCase().trim() !== 'trainee';
+            
+            if (isLeader) {
+                dom.planningViewToggle.classList.remove('hidden');
+                dom.employeeView.classList.add('hidden');
+                dom.leadershipView.classList.remove('hidden');
+                const teamMembers = await findTeamMembers(userName);
+                await renderLeadershipView(teamMembers);
+                updateMonthlyPlanningView(teamData);
+                dom.monthlyPlanningTitle.textContent = "Team Monatsplanung";
+            } else {
+                dom.planningViewToggle.classList.add('hidden');
+                dom.leadershipView.classList.add('hidden');
+                dom.employeeView.classList.remove('hidden');
+                updateMonthlyPlanningView(personalData);
+                updateEmployeeCareerView();
+                dom.monthlyPlanningTitle.textContent = "Deine Monatsplanung";
+            }
+
             setStatus('');
-            updateProgress();
+            dom.dashboardSections.classList.remove('hidden', 'opacity-0');
         }
 
         async function populateUserDropdown(){
@@ -797,7 +869,7 @@
             clearChildren(dom.userListElement);
             users.forEach(u=>{
                 const li = document.createElement('li'); li.textContent=u;
-                li.className='py-3 px-4 rounded-md hover:bg-skt-grey-light cursor-pointer transition-colors text-skt-blue-light';
+                li.className='py-2 px-4 hover:bg-skt-grey-light cursor-pointer transition-colors text-skt-blue-light';
                 li.addEventListener('click',()=>{fetchAndRenderDashboard(u); dom.userDropdown.classList.add('hidden');});
                 dom.userListElement.appendChild(li);
             });
@@ -806,6 +878,22 @@
         // --- EVENTS ---
         dom.userSelectButton.addEventListener('click', ()=>{ fetchUserList(); dom.userDropdown.classList.toggle('hidden'); });
         window.addEventListener('click', e=>{ if(!dom.userSelectButton.contains(e.target) && !dom.userDropdown.contains(e.target)) dom.userDropdown.classList.add('hidden'); });
+        
+        dom.teamViewBtn.addEventListener('click', () => {
+            currentPlanningView = 'team';
+            dom.teamViewBtn.classList.add('active');
+            dom.personalViewBtn.classList.remove('active');
+            dom.monthlyPlanningTitle.textContent = "Team Monatsplanung";
+            updateMonthlyPlanningView(teamData);
+        });
+
+        dom.personalViewBtn.addEventListener('click', () => {
+            currentPlanningView = 'personal';
+            dom.personalViewBtn.classList.add('active');
+            dom.teamViewBtn.classList.remove('active');
+            dom.monthlyPlanningTitle.textContent = "Deine Monatsplanung";
+            updateMonthlyPlanningView(personalData);
+        });
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
