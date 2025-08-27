@@ -89,6 +89,15 @@
         .details-grid { border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem; }
         .chevron-icon { transition: transform 0.3s ease-in-out; }
         .open .chevron-icon { transform: rotate(180deg); }
+
+        .team-progress-circle { transform: rotate(-90deg); }
+        .team-progress-circle .bg-circle { fill: none; stroke: #e2e8f0; stroke-width: 8; }
+        .team-progress-circle .progress-arc { 
+            fill: none; 
+            stroke-width: 8; 
+            transition: stroke-dashoffset 0.7s ease-out, stroke 0.5s ease; 
+            stroke-linecap: round; 
+        }
         
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
@@ -111,13 +120,6 @@
         .view-toggle button:not(.active) {
             background-color: var(--color-skt-grey-light);
             color: var(--color-skt-blue-light);
-        }
-
-        /* MODIFIED: Fix for user dropdown on mobile */
-        @media (max-width: 639px) {
-            .dropdown-menu {
-                right: 2rem; /* Counteracts header padding to align with viewport edge */
-            }
         }
     </style>
 </head>
@@ -147,22 +149,22 @@
     <!-- Dashboard-Container -->
     <div id="dashboard-content" class="hidden flex-col min-h-screen">
         <header class="w-full p-8 md:p-12 bg-skt-blue relative rounded-b-3xl">
-            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between relative">
-                <div class="flex flex-col">
-                    <h1 class="text-4xl sm:text-5xl font-bold font-times-new-roman text-white mb-2" id="welcome-header">Willkommen,</h1>
-                    <p id="user-position" class="text-lg text-gold font-bold"></p>
-                    <p class="text-lg sm:text-xl text-white mt-2">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
-                </div>
-                <div class="relative mt-4 sm:mt-0">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-start gap-x-8 gap-y-4 relative">
+                <div class="relative self-start sm:self-center">
                     <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors h-10 w-10 flex items-center justify-center">
                         <i class="fas fa-users"></i>
                     </button>
                     <div id="user-dropdown" class="dropdown-menu hidden"><ul id="user-list" class="user-list"></ul></div>
                 </div>
+                <div class="flex flex-col">
+                    <h1 class="text-4xl sm:text-5xl font-bold font-times-new-roman text-white mb-2" id="welcome-header">Willkommen,</h1>
+                    <p id="user-position" class="text-lg text-gold font-bold"></p>
+                    <p class="text-lg sm:text-xl text-white mt-2">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
+                </div>
             </div>
         </header>
 
-        <main class="flex flex-col w-full max-w-7xl mx-auto flex-grow p-6 md:p-8 space-y-12">
+        <main class="flex flex-col w-full max-w-7xl mx-auto flex-grow p-6 md:p-8 space-y-12 overflow-hidden">
             <div id="status-message" class="flex flex-col items-center justify-center text-center text-lg font-semibold text-skt-blue mt-6">
                 <div class="loader mb-4"></div><p id="status-text">Daten werden geladen...</p>
             </div>
@@ -176,7 +178,7 @@
                             <button id="personal-view-btn" class="flex-1">Persönlich</button>
                         </div>
                     </div>
-                    <div class="mb-8"><div id="weekly-progress-container" class="w-full flex relative h-5 mb-4 items-end"></div></div>
+                    <div class="mb-8 overflow-hidden"><div id="weekly-progress-container" class="w-full flex relative h-5 mb-4 items-end"></div></div>
                     <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
                         <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-sm max-h-sm">
                             <svg class="progress-circle-monthly w-full h-full" viewBox="0 0 100 100">
@@ -196,7 +198,6 @@
                                     <span id="eh-center-current">0</span>/<span id="eh-center-goal">0</span>
                                 </p>
                                 <p class="text-sm text-gray-500">Einheiten erreicht</p>
-                                <!-- MODIFIED: Added Soll value display -->
                                 <p class="text-lg font-bold text-skt-yellow-accent mt-2">
                                     <span id="eh-soll-value">0</span>
                                 </p>
@@ -209,7 +210,6 @@
                                 <p class="text-lg font-bold text-skt-blue" id="appointments-text">0 / 0 / 0</p>
                                 <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
                                 <div id="appointments-progress-bar" class="w-full bg-skt-yellow-accent h-3 rounded-full overflow-hidden relative">
-                                    <!-- MODIFIED: Changed bar color to yellow -->
                                     <div id="appointments-vereinbart-bar" class="h-full bg-skt-blue-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
                                     <div id="appointments-gehalten-bar" class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
                                 </div>
@@ -265,9 +265,15 @@
 
                 <section id="leadership-view" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-lg">
                     <div id="leader-personal-goal-container" class="mb-8"></div>
-                    <h2 class="text-2xl font-semibold text-skt-blue mb-4 text-center">Dein Team-Überblick</h2>
-                    <p class="text-center text-skt-blue-light mb-8">Du hast <strong id="team-count" class="text-skt-blue">0</strong> aktive Mitarbeiter in deinem Team.</p>
-                    <div id="team-members-container" class="mt-6 space-y-4"></div>
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                        <h2 class="text-2xl font-semibold text-skt-blue">Dein Team-Überblick</h2>
+                        <div id="team-view-mode-toggle" class="view-toggle flex space-x-2">
+                            <button id="grid-view-btn" title="Kachelansicht"><i class="fas fa-th-large"></i></button>
+                            <button id="list-view-btn" class="active" title="Listenansicht"><i class="fas fa-bars"></i></button>
+                        </div>
+                    </div>
+                    <p class="text-center sm:text-left text-skt-blue-light mb-8">Du hast <strong id="team-count" class="text-skt-blue">0</strong> aktive Mitarbeiter in deinem Team.</p>
+                    <div id="team-members-container" class="mt-6"></div>
                     <div id="passive-members-section" class="mt-8"></div>
                 </section>
             </div>      
@@ -291,10 +297,14 @@
 
         let personalData = {};
         let teamData = {};
-        let leaderPromotionData = []; // Cache for leader promotion goals
-        let traineePromotionData = {}; // Cache for the current user's trainee goal
-        let currentPlanningView = 'team'; // 'team' or 'personal'
-        let allUsersCache = []; // PERFORMANCE: Cache für die Benutzerliste
+        let leaderPromotionData = [];
+        let traineePromotionData = {};
+        let currentPlanningView = 'team';
+        let allUsersCache = [];
+        let currentTeamViewMode = 'list'; // MODIFIED: Default view is now 'list'
+        let cachedActiveMembers = [];
+        let cachedCycleData = {};
+
 
         // --- DOM ELEMENTS
         const dom = {
@@ -350,6 +360,8 @@
             planningViewToggle: document.getElementById('planning-view-toggle'),
             teamViewBtn: document.getElementById('team-view-btn'),
             personalViewBtn: document.getElementById('personal-view-btn'),
+            gridViewBtn: document.getElementById('grid-view-btn'),
+            listViewBtn: document.getElementById('list-view-btn'),
         };
 
         // --- HILFSFUNKTIONEN ---
@@ -635,11 +647,9 @@
             animateValue(dom.etCurrentDisplay, 0, data.etCurrent, 1000, false);
             dom.etGoalDisplay.textContent = data.etGoal;
             
-            // Update actual progress circle (outer)
             const actualPercentage = data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0;
             updateCircleProgress(dom.ehProgressCircle, 45, actualPercentage);
             
-            // Update prognosis circle (inner)
             const { startDate, endDate } = getMonthlyCycleDates();
             const today = new Date();
             const totalDaysInCycle = (endDate - startDate) / (1000 * 60 * 60 * 24);
@@ -647,19 +657,15 @@
             const timeElapsedPercentage = totalDaysInCycle > 0 ? (daysPassedInCycle / totalDaysInCycle) * 100 : 0;
             updateCircleProgress(dom.prognosisCircleEh, 35, timeElapsedPercentage);
 
-            // MODIFIED: Calculate and display Soll value
             const sollEinheiten = Math.round(data.ehGoal * (timeElapsedPercentage / 100));
             if (dom.ehSollValue) {
                 animateValue(dom.ehSollValue, 0, sollEinheiten, 1000, false);
             }
 
-            // Draw week dividers on the circle
             drawSegmentDividers();
 
-            // Update appointments text
             dom.appointmentsText.textContent = `${data.atCurrent} / ${data.atVereinbart} / ${data.atGoal}`;
             
-            // Update appointments progress bars
             const vereinbartPercent = data.atGoal > 0 ? (data.atVereinbart / data.atGoal) * 100 : 0;
             const gehaltenPercent = data.atGoal > 0 ? (data.atCurrent / data.atGoal) * 100 : 0;
             dom.appointmentsVereinbartBar.style.width = `${Math.min(vereinbartPercent, 100)}%`;
@@ -773,6 +779,20 @@
             return team;
         }
         
+        function getProgressColorHex(current, goal, totalDays, daysPassed) {
+            if (goal === 0) return 'var(--color-skt-grey-medium)';
+            const progressPercent = (current / goal) * 100;
+            if (progressPercent >= 100) return 'var(--color-accent-green)';
+
+            if (daysPassed <= 0) return 'var(--color-accent-green)';
+
+            const timePercent = (daysPassed / totalDays) * 100;
+
+            if (progressPercent >= timePercent) return 'var(--color-accent-green)';
+            if (progressPercent >= timePercent * 0.75) return 'var(--color-accent-yellow)';
+            return 'var(--color-accent-red)';
+        }
+
         function getProgressColorClass(current, goal, totalDays, daysPassed) {
             if (goal === 0) return 'bg-skt-grey-medium';
             const progressPercent = (current / goal) * 100;
@@ -797,9 +817,8 @@
             const timePercent = (daysPassed / totalDays) * 100;
 
             if (progressPercent >= timePercent) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
-            // MODIFIED: Text for yellow state is now empty
             if (progressPercent >= timePercent * 0.75) return { text: '', colorClass: 'text-skt-yellow-accent' };
-            return { text: 'Ziele gefährdet', colorClass: 'text-skt-red-accent' };
+            return { text: 'Ziele ‼️', colorClass: 'text-skt-red-accent' };
         }
 
         function renderLeaderPersonalGoal(userName) {
@@ -847,13 +866,14 @@
 
             if (team.length === 0) {
                 dom.teamCount.textContent = '0';
-                dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine Mitarbeiter in der Liste.</p>`;
+                dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500 col-span-full">Du hast aktuell keine Mitarbeiter in der Liste.</p>`;
+                return;
             }
 
             const { startDate, endDate } = getMonthlyCycleDates();
             const today = new Date();
-            const totalDaysInCycle = (endDate - startDate) / (1000 * 60 * 60 * 24);
-            const daysPassedInCycle = Math.max(0, (today - startDate) / (1000 * 60 * 60 * 24));
+            cachedCycleData.totalDaysInCycle = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            cachedCycleData.daysPassedInCycle = Math.max(0, (today - startDate) / (1000 * 60 * 60 * 24));
 
             const memberDataPromises = team.map(async (memberName) => {
                 const query = `select B, C, D, E, F, G, H, J where A = '${memberName.trim()}'`;
@@ -887,7 +907,6 @@
                 return acc;
             }, { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atVereinbart: 0, atCurrent: 0 });
 
-            // Team-Gesamtwerte berechnen, indem die persönlichen Daten des Leiters addiert werden
             teamData = {
                 ehGoal: teamMembersTotal.ehGoal + (personalData.ehGoal || 0),
                 ehCurrent: teamMembersTotal.ehCurrent + (personalData.ehCurrent || 0),
@@ -898,19 +917,12 @@
                 atCurrent: teamMembersTotal.atCurrent + (personalData.atCurrent || 0)
             };
 
-            const activeMembers = membersData.filter(m => m.ehGoal > 0 || m.etGoal > 0);
+            cachedActiveMembers = membersData.filter(m => m.ehGoal > 0 || m.etGoal > 0);
             const passiveMembers = membersData.filter(m => m.ehGoal === 0 && m.etGoal === 0);
 
-            dom.teamCount.textContent = activeMembers.length;
+            dom.teamCount.textContent = cachedActiveMembers.length;
 
-            if (activeMembers.length === 0 && team.length > 0) {
-                 dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500">Du hast aktuell keine aktiven Mitarbeiter in der Liste.</p>`;
-            } else {
-                activeMembers.forEach(member => {
-                    const card = createMemberCard(member, totalDaysInCycle, daysPassedInCycle);
-                    dom.teamMembersContainer.appendChild(card);
-                });
-            }
+            renderTeamMemberCards();
 
             if (passiveMembers.length > 0) {
                 const details = document.createElement('details');
@@ -944,17 +956,78 @@
             }
         }
 
-        function createMemberCard(member, totalDaysInCycle, daysPassedInCycle) {
+        function renderTeamMemberCards() {
+            clearChildren(dom.teamMembersContainer);
+            dom.teamMembersContainer.className = 'mt-6'; 
+
+            if (cachedActiveMembers.length === 0) {
+                dom.teamMembersContainer.innerHTML = `<p class="text-center text-gray-500 col-span-full">Du hast aktuell keine aktiven Mitarbeiter in der Liste.</p>`;
+                return;
+            }
+
+            if (currentTeamViewMode === 'grid') {
+                dom.teamMembersContainer.classList.add('grid', 'grid-cols-1', 'sm:grid-cols-2', 'lg:grid-cols-3', 'gap-6');
+                cachedActiveMembers.forEach(member => {
+                    const card = createMemberCardGrid(member, cachedCycleData.totalDaysInCycle, cachedCycleData.daysPassedInCycle);
+                    dom.teamMembersContainer.appendChild(card);
+                });
+            } else { // 'list'
+                dom.teamMembersContainer.classList.add('space-y-4');
+                cachedActiveMembers.forEach(member => {
+                    const card = createMemberCardList(member, cachedCycleData.totalDaysInCycle, cachedCycleData.daysPassedInCycle);
+                    dom.teamMembersContainer.appendChild(card);
+                });
+            }
+        }
+
+        function createMemberCardGrid(member, totalDaysInCycle, daysPassedInCycle) {
             const ehPercentage = member.ehGoal > 0 ? (member.ehCurrent / member.ehGoal * 100) : 0;
-            const ehColorClass = getProgressColorClass(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+            const ehColorHex = getProgressColorHex(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
             const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
             const memberId = member.name.replace(/[^a-zA-Z0-9]/g, '');
-            const prognosisVisibilityClass = prognosis.text ? '' : 'hidden sm:inline';
-
 
             const card = document.createElement('div');
-            card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
-            
+            card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl flex flex-col';
+
+            const summary = document.createElement('div');
+            summary.className = 'p-4 cursor-pointer flex-grow';
+
+            const radius = 35;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference * (1 - Math.min(ehPercentage, 100) / 100);
+
+            summary.innerHTML = `
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="font-bold text-skt-blue text-lg">${member.name}</p>
+                        <p class="text-sm text-skt-blue-light">${member.position}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                         <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln"><i class="fas fa-eye"></i></button>
+                         <i class="fas fa-chevron-down chevron-icon text-skt-blue-light"></i>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center flex-col">
+                    <div class="w-32 h-32 relative">
+                        <svg class="team-progress-circle w-full h-full" viewBox="0 0 100 100">
+                            <circle class="bg-circle" cx="50" cy="50" r="${radius}"></circle>
+                            <circle class="progress-arc" cx="50" cy="50" r="${radius}" 
+                                    style="stroke: ${ehColorHex}; stroke-dasharray: ${circumference}; stroke-dashoffset: ${offset};"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
+                            <p class="text-lg font-bold" style="color: ${ehColorHex};">${member.ehCurrent}/${member.ehGoal}</p>
+                            <p class="text-xs text-skt-blue-light">Einheiten</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="font-semibold text-sm ${prognosis.colorClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
+                    </div>
+                </div>
+            `;
+
+            const details = document.createElement('div');
+            details.className = 'team-member-details px-4';
+
             const etPercentage = member.etGoal > 0 ? (member.etCurrent / member.etGoal) * 100 : 0;
             let etDetailsHtml = '';
             if (member.etGoal > 0) {
@@ -986,26 +1059,41 @@
                 </div>
             `;
 
-            const details = document.createElement('div');
-            details.className = 'team-member-details px-4';
             details.innerHTML = `
-                <div class="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="details-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
                     ${etDetailsHtml}
                     ${atDetailsHtml}
-                    <div class="md:col-span-2" id="leader-goal-${memberId}"></div>
+                    <div class="sm:col-span-2" id="leader-goal-${memberId}"></div>
                 </div>`;
 
+            card.appendChild(summary);
+            card.appendChild(details);
+            
+            summary.addEventListener('click', (e) => { if (!e.target.closest('.switch-view-btn')) { details.classList.toggle('open'); summary.classList.toggle('open'); } });
+            summary.querySelector('.switch-view-btn').addEventListener('click', (e) => { e.stopPropagation(); fetchAndRenderDashboard(e.currentTarget.dataset.username); });
+            return card;
+        }
+
+        function createMemberCardList(member, totalDaysInCycle, daysPassedInCycle) {
+            const ehPercentage = member.ehGoal > 0 ? (member.ehCurrent / member.ehGoal * 100) : 0;
+            const ehColorClass = getProgressColorClass(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+            const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
+            const memberId = member.name.replace(/[^a-zA-Z0-9]/g, '');
+            
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
+            
             const summary = document.createElement('div');
             summary.className = 'p-4 cursor-pointer';
             
             summary.innerHTML = `
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-2">
                     <div>
                         <p class="font-bold text-skt-blue text-lg">${member.name}</p>
                         <p class="text-sm text-skt-blue-light">${member.position}</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="font-semibold text-sm whitespace-nowrap ${prognosis.colorClass} ${prognosisVisibilityClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
+                        <span class="font-semibold text-sm ${prognosis.colorClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
                         <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln"><i class="fas fa-eye"></i></button>
                         <i class="fas fa-chevron-down chevron-icon text-skt-blue-light"></i>
                     </div>
@@ -1021,52 +1109,50 @@
                 </div>
             `;
 
-            card.appendChild(summary);
-            card.appendChild(details);
+            const details = document.createElement('div');
+            details.className = 'team-member-details px-4';
 
-            // Logic to add leader promotion goal
-            if (member.position && member.position.toLowerCase().trim() !== 'trainee') {
-                const leaderGoalContainer = details.querySelector(`#leader-goal-${memberId}`);
-                const promotionInfo = leaderPromotionData.find(p => p.name.toLowerCase() === member.name.toLowerCase().trim());
-                
-                if (leaderGoalContainer) {
-                    let goalHtml = '';
-                    if (promotionInfo) {
-                        const required = 6; // BL requires 6 MA
-                        const filled = required - promotionInfo.missing;
-                        let slotsHtml = '';
-                        for(let i=0; i < required; i++){
-                            slotsHtml += `<div class="employee-slot ${i < filled ? 'filled' : ''}"></div>`;
-                        }
-
-                        goalHtml = `
-                            <div class="mt-2 pt-4 border-t border-gray-200">
-                                <p class="text-sm font-semibold text-skt-blue">Nächstes Karriereziel</p>
-                                <div class="flex justify-between items-center mt-1">
-                                    <div>
-                                        <p class="text-xs text-skt-blue-light font-bold">Ziel: Bezirksleitung</p>
-                                        <p class="text-xs text-skt-blue-light">Start im Rennen: ${promotionInfo.startDate}</p>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-lg font-bold text-skt-blue">${filled}/${required}</span>
-                                        <div class="flex space-x-1.5">${slotsHtml}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        goalHtml = `
-                            <div class="mt-2 pt-4 border-t border-gray-200">
-                                <p class="text-sm font-semibold text-skt-blue">Nächstes Karriereziel</p>
-                                <p class="text-xs text-skt-red-accent font-semibold mt-1">Karriereschritt im nächsten PG besprechen.</p>
-                            </div>
-                        `;
-                    }
-                    leaderGoalContainer.innerHTML = goalHtml;
-                }
+            const etPercentage = member.etGoal > 0 ? (member.etCurrent / member.etGoal) * 100 : 0;
+            let etDetailsHtml = '';
+            if (member.etGoal > 0) {
+                etDetailsHtml = `
+                    <div class="text-center">
+                        <p class="text-sm font-semibold text-skt-blue mb-1">Bewerbungsgespräche</p>
+                        <p class="text-md font-bold text-skt-blue">${member.etCurrent} / ${member.etGoal}</p>
+                        <p class="text-xs text-gray-500 mb-2">Gehalten / Ziel</p>
+                        <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden relative">
+                            <div class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(etPercentage, 100)}%;"></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                etDetailsHtml = `<div class="text-center flex flex-col justify-center h-full"><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
             }
 
+            const vereinbartPercent = member.atGoal > 0 ? (member.atVereinbart / member.atGoal) * 100 : 0;
+            const gehaltenPercent = member.atGoal > 0 ? (member.atCurrent / member.atGoal) * 100 : 0;
+            const atDetailsHtml = `
+                <div class="text-center">
+                    <p class="text-sm font-semibold text-skt-blue mb-1">Analysetermine</p>
+                    <p class="text-md font-bold text-skt-blue">${member.atCurrent} / ${member.atVereinbart} / ${member.atGoal}</p>
+                    <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
+                    <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden relative">
+                        <div class="h-full bg-skt-yellow-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(vereinbartPercent, 100)}%;"></div>
+                        <div class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(gehaltenPercent, 100)}%;"></div>
+                    </div>
+                </div>
+            `;
 
+            details.innerHTML = `
+                <div class="details-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    ${etDetailsHtml}
+                    ${atDetailsHtml}
+                    <div class="sm:col-span-2" id="leader-goal-${memberId}"></div>
+                </div>`;
+
+            card.appendChild(summary);
+            card.appendChild(details);
+            
             summary.addEventListener('click', (e) => { if (!e.target.closest('.switch-view-btn')) { details.classList.toggle('open'); summary.classList.toggle('open'); } });
             summary.querySelector('.switch-view-btn').addEventListener('click', (e) => { e.stopPropagation(); fetchAndRenderDashboard(e.currentTarget.dataset.username); });
             return card;
@@ -1115,19 +1201,15 @@
             dom.dashboardSections.classList.remove('hidden', 'opacity-0');
         }
 
-        // --- PERFORMANCE UPDATE: Caching der Benutzerliste ---
         async function getAllUsers() {
-            // Wenn der Cache bereits gefüllt ist, die Daten direkt zurückgeben
             if (allUsersCache.length > 0) {
                 return allUsersCache;
             }
-            // Ansonsten die Daten von Google Sheets abrufen
             const data = await fetchSheetQuery(sheetDataName, 'select A');
             if (!data || !data.table.rows) {
                 console.error("Fehler beim Laden der Benutzerliste.");
                 return [];
             }
-            // Benutzer filtern und im Cache speichern
             const users = filterUsers(data.table.rows.map(r => r.c[0]?.v).filter(Boolean));
             allUsersCache = users;
             return allUsersCache;
@@ -1165,7 +1247,6 @@
             });
         }
 
-
         // --- EVENTS ---
         dom.userSelectButton.addEventListener('click', ()=>{ fetchUserList(); dom.userDropdown.classList.toggle('hidden'); });
         window.addEventListener('click', e=>{ if(!dom.userSelectButton.contains(e.target) && !dom.userDropdown.contains(e.target)) dom.userDropdown.classList.add('hidden'); });
@@ -1184,6 +1265,22 @@
             dom.teamViewBtn.classList.remove('active');
             dom.monthlyPlanningTitle.textContent = "Deine Monatsplanung";
             updateMonthlyPlanningView(personalData);
+        });
+
+        dom.gridViewBtn.addEventListener('click', () => {
+            if (currentTeamViewMode === 'grid') return;
+            currentTeamViewMode = 'grid';
+            dom.gridViewBtn.classList.add('active');
+            dom.listViewBtn.classList.remove('active');
+            renderTeamMemberCards();
+        });
+
+        dom.listViewBtn.addEventListener('click', () => {
+            if (currentTeamViewMode === 'list') return;
+            currentTeamViewMode = 'list';
+            dom.listViewBtn.classList.add('active');
+            dom.gridViewBtn.classList.remove('active');
+            renderTeamMemberCards();
         });
 
         // --- INIT ---
