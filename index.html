@@ -71,7 +71,7 @@
         .employee-slot { width: 20px; height: 20px; background-color: var(--color-skt-grey-medium); border-radius: 50%; transition: background-color 0.3s ease-out; border: 1px solid var(--color-skt-grey-medium); }
         .employee-slot.filled { background-color: var(--color-accent-green); }
         
-        .dropdown-menu { position: absolute; top: 100%; right: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); z-index: 50; width: 200px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+        .dropdown-menu { position: absolute; top: 100%; left: 0; background-color: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); z-index: 50; width: 200px; margin-top: 8px; max-height: 300px; overflow-y: auto; }
         
         .week-divider { position: absolute; height: calc(100% + 0.25rem); top: -0.125rem; width: 2px; background-color: #e2e8f0; z-index: 10; }
         .start-end-divider { position: absolute; height: calc(100% + 0.25rem); top: -0.125rem; width: 2px; background-color: #e2e8f0; z-index: 10; }
@@ -111,6 +111,13 @@
         .view-toggle button:not(.active) {
             background-color: var(--color-skt-grey-light);
             color: var(--color-skt-blue-light);
+        }
+
+        /* MODIFIED: Fix for user dropdown on mobile */
+        @media (max-width: 639px) {
+            .dropdown-menu {
+                right: 2rem; /* Counteracts header padding to align with viewport edge */
+            }
         }
     </style>
 </head>
@@ -185,19 +192,24 @@
                                 <g id="segment-dividers-eh"></g>
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
-                                <p class="text-4xl font-bold text-skt-green-accent">
+                                <p class="text-3xl font-bold text-skt-green-accent">
                                     <span id="eh-center-current">0</span>/<span id="eh-center-goal">0</span>
                                 </p>
-                                <p class="text-md text-gray-500 mt-1">Einheiten erreicht</p>
+                                <p class="text-sm text-gray-500">Einheiten erreicht</p>
+                                <!-- MODIFIED: Added Soll value display -->
+                                <p class="text-lg font-bold text-skt-yellow-accent mt-2">
+                                    <span id="eh-soll-value">0</span>
+                                </p>
+                                <p class="text-xs text-gray-500">Soll Einheiten</p>
                             </div>
                         </div>
-                        <!-- MODIFIED: Layout structure simplified and centered -->
                         <div class="flex-grow md:w-1/2 flex flex-col gap-8 w-full justify-center">
                             <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
                                 <p class="text-sm font-semibold text-skt-blue mb-2">Analysetermine</p>
                                 <p class="text-lg font-bold text-skt-blue" id="appointments-text">0 / 0 / 0</p>
                                 <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
-                                <div id="appointments-progress-bar" class="w-full bg-skt-grey-medium h-3 rounded-full overflow-hidden relative">
+                                <div id="appointments-progress-bar" class="w-full bg-skt-yellow-accent h-3 rounded-full overflow-hidden relative">
+                                    <!-- MODIFIED: Changed bar color to yellow -->
                                     <div id="appointments-vereinbart-bar" class="h-full bg-skt-blue-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
                                     <div id="appointments-gehalten-bar" class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
                                 </div>
@@ -307,6 +319,7 @@
             segmentDividersEh: document.getElementById('segment-dividers-eh'), 
             ehCenterCurrent: document.getElementById('eh-center-current'),
             ehCenterGoal: document.getElementById('eh-center-goal'),
+            ehSollValue: document.getElementById('eh-soll-value'),
             etCurrentDisplay: document.getElementById('et-current'),
             etGoalDisplay: document.getElementById('et-goal'),
             appointmentsText: document.getElementById('appointments-text'),
@@ -634,6 +647,12 @@
             const timeElapsedPercentage = totalDaysInCycle > 0 ? (daysPassedInCycle / totalDaysInCycle) * 100 : 0;
             updateCircleProgress(dom.prognosisCircleEh, 35, timeElapsedPercentage);
 
+            // MODIFIED: Calculate and display Soll value
+            const sollEinheiten = Math.round(data.ehGoal * (timeElapsedPercentage / 100));
+            if (dom.ehSollValue) {
+                animateValue(dom.ehSollValue, 0, sollEinheiten, 1000, false);
+            }
+
             // Draw week dividers on the circle
             drawSegmentDividers();
 
@@ -780,7 +799,7 @@
             if (progressPercent >= timePercent) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
             // MODIFIED: Text for yellow state is now empty
             if (progressPercent >= timePercent * 0.75) return { text: '', colorClass: 'text-skt-yellow-accent' };
-            return { text: 'Ziele stark gefährdet', colorClass: 'text-skt-red-accent' };
+            return { text: 'Ziele gefährdet', colorClass: 'text-skt-red-accent' };
         }
 
         function renderLeaderPersonalGoal(userName) {
@@ -930,6 +949,8 @@
             const ehColorClass = getProgressColorClass(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
             const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
             const memberId = member.name.replace(/[^a-zA-Z0-9]/g, '');
+            const prognosisVisibilityClass = prognosis.text ? '' : 'hidden sm:inline';
+
 
             const card = document.createElement('div');
             card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
@@ -959,7 +980,7 @@
                     <p class="text-md font-bold text-skt-blue">${member.atCurrent} / ${member.atVereinbart} / ${member.atGoal}</p>
                     <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
                     <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden relative">
-                        <div class="h-full bg-skt-blue-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(vereinbartPercent, 100)}%;"></div>
+                        <div class="h-full bg-skt-yellow-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(vereinbartPercent, 100)}%;"></div>
                         <div class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(gehaltenPercent, 100)}%;"></div>
                     </div>
                 </div>
@@ -976,6 +997,7 @@
 
             const summary = document.createElement('div');
             summary.className = 'p-4 cursor-pointer';
+            
             summary.innerHTML = `
                 <div class="flex justify-between items-center">
                     <div>
@@ -983,7 +1005,7 @@
                         <p class="text-sm text-skt-blue-light">${member.position}</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="font-semibold text-sm ${prognosis.colorClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
+                        <span class="font-semibold text-sm whitespace-nowrap ${prognosis.colorClass} ${prognosisVisibilityClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
                         <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln"><i class="fas fa-eye"></i></button>
                         <i class="fas fa-chevron-down chevron-icon text-skt-blue-light"></i>
                     </div>
