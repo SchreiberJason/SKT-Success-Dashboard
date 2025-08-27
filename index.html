@@ -38,6 +38,7 @@
         .bg-skt-red-accent { background-color: var(--color-accent-red); }
         .text-skt-yellow-accent { color: var(--color-accent-yellow); }
         .bg-skt-yellow-accent { background-color: var(--color-accent-yellow); }
+        .bg-skt-blue-accent { background-color: var(--color-skt-blue-main); }
         .text-gold { color: var(--color-accent-gold); }
         
         body {
@@ -55,8 +56,13 @@
 
         .progress-circle-monthly { transform: rotate(-90deg); }
         .progress-circle-monthly .bg-circle { fill: none; stroke: #e2e8f0; stroke-width: 8; }
-        .progress-circle-monthly .progress-arc-eh { fill: none; stroke: var(--color-accent-green); stroke-width: 10; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
-        .progress-circle-monthly .progress-arc-et { fill: none; stroke: var(--color-skt-blue-main); stroke-width: 7; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
+        .progress-circle-monthly .progress-arc-eh { fill: none; stroke: var(--color-accent-green); stroke-width: 8; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
+        /* Stile für den inneren Prognose-Kreis */
+        .progress-circle-monthly .prognosis-bg-circle { fill: none; stroke: #e2e8f0; stroke-width: 4; }
+        .progress-circle-monthly .prognosis-arc-eh { fill: none; stroke: var(--color-accent-yellow); stroke-width: 4; transition: stroke-dashoffset 0.7s ease-out; stroke-linecap: round; }
+        /* Stile für die Segment-Trenner */
+        #segment-dividers-eh line { stroke: var(--color-skt-grey-light); stroke-width: 2; }
+
 
         .tier-card { background-color: white; border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; border: 2px solid transparent; }
         .tier-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); }
@@ -110,7 +116,7 @@
 </head>
 <body class="flex flex-col min-h-screen text-skt-blue">
     <!-- Auswahlbereich für Benutzer -->
-    <div id="user-select-screen" class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div id="user-select-screen" class="flex flex-col items-center justify-start min-h-screen bg-gray-100 p-4 pt-16 sm:pt-24">
         <div class="w-full max-w-sm bg-white p-8 rounded-2xl shadow-xl border border-gray-200 text-center transform transition-transform duration-300 hover:scale-105">
             <div class="mb-6">
                 <h1 class="text-3xl font-extrabold text-skt-blue leading-tight">Willkommen zurück!</h1>
@@ -126,7 +132,7 @@
                     </div>
                 </div>
             </div>
-            <button id="start-dashboard-btn" class="w-full bg-skt-blue text-white font-semibold py-3 rounded-xl hover:bg-skt-blue-light transition-colors duration-200 shadow-md transform hover:-translate-y-0.5 active:translate-y-0 text-lg">Dashboard laden</button>
+            <button id="start-dashboard-btn" class="hidden w-full bg-skt-blue text-white font-semibold py-3 rounded-xl hover:bg-skt-blue-light transition-colors duration-200 shadow-md transform hover:-translate-y-0.5 active:translate-y-0 text-lg">Dashboard laden</button>
             <p id="user-select-error" class="text-red-600 mt-4 h-5 text-sm"></p>
         </div>
     </div>
@@ -141,7 +147,9 @@
                     <p class="text-lg sm:text-xl text-white mt-2">Dein persönliches Dashboard für Erfolg und Karriereplanung.</p>
                 </div>
                 <div class="relative mt-4 sm:mt-0">
-                    <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors">Benutzer wechseln</button>
+                    <button id="user-select-button" class="bg-skt-blue-light text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-skt-blue-main transition-colors h-10 w-10 flex items-center justify-center">
+                        <i class="fas fa-users"></i>
+                    </button>
                     <div id="user-dropdown" class="dropdown-menu hidden"><ul id="user-list" class="user-list"></ul></div>
                 </div>
             </div>
@@ -165,28 +173,38 @@
                     <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
                         <div class="flex-grow md:w-1/2 relative w-full h-auto max-w-sm max-h-sm">
                             <svg class="progress-circle-monthly w-full h-full" viewBox="0 0 100 100">
-                                <circle class="bg-circle" cx="50" cy="50" r="40"></circle><circle class="bg-circle" cx="50" cy="50" r="30"></circle>
-                                <circle class="progress-arc-eh" cx="50" cy="50" r="40" id="progress-circle-eh"></circle><circle class="progress-arc-et" cx="50" cy="50" r="30" id="progress-circle-et"></circle>
+                                <!-- Outer Ring (Actual Progress) -->
+                                <circle class="bg-circle" cx="50" cy="50" r="45"></circle>
+                                <circle class="progress-arc-eh" cx="50" cy="50" r="45" id="progress-circle-eh"></circle>
+                                
+                                <!-- Inner Ring (Expected/Soll Progress) -->
+                                <circle class="prognosis-bg-circle" cx="50" cy="50" r="35"></circle>
+                                <circle class="prognosis-arc-eh" cx="50" cy="50" r="35" id="prognosis-circle-eh"></circle>
+
+                                <!-- Segment dividers will be injected here by JS -->
+                                <g id="segment-dividers-eh"></g>
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center flex-col text-center">
-                                <p class="text-3xl font-bold text-skt-green-accent" id="eh-percentage-text">0%</p><p class="text-sm text-gray-500">Einheiten</p>
-                                <div class="mt-4"><p class="text-xl font-bold text-skt-blue-main" id="et-percentage-text">0%</p><p class="text-xs text-gray-500">Termine</p></div>
+                                <p class="text-4xl font-bold text-skt-green-accent">
+                                    <span id="eh-center-current">0</span>/<span id="eh-center-goal">0</span>
+                                </p>
+                                <p class="text-md text-gray-500 mt-1">Einheiten erreicht</p>
                             </div>
                         </div>
-                        <div class="flex-grow md:w-1/2 flex flex-col gap-8 w-full">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
-                                    <p class="text-xs text-skt-blue-light font-bold" data-tooltip="Erreichte Einheiten in diesem Monat">Einheiten</p>
-                                    <p class="text-xl font-bold text-skt-blue mt-1"><span id="eh-current">0</span>/<span id="eh-goal">0</span></p><p class="text-xs text-gray-500 mt-1">Einheiten erreicht.</p>
-                                </div>
-                                <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
-                                    <p class="text-xs text-skt-blue-light font-bold" data-tooltip="Vereinbarte Analysetermine">Termine</p>
-                                    <p class="text-xl font-bold text-skt-blue mt-1"><span id="at-ver-display">0</span>/<span id="at-soll-display">0</span></p><p class="text-xs text-gray-500 mt-1">Analysen gemacht.</p>
+                        <!-- MODIFIED: Layout structure simplified and centered -->
+                        <div class="flex-grow md:w-1/2 flex flex-col gap-8 w-full justify-center">
+                            <div class="p-4 bg-skt-grey-light rounded-xl shadow-md text-center">
+                                <p class="text-sm font-semibold text-skt-blue mb-2">Analysetermine</p>
+                                <p class="text-lg font-bold text-skt-blue" id="appointments-text">0 / 0 / 0</p>
+                                <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
+                                <div id="appointments-progress-bar" class="w-full bg-skt-grey-medium h-3 rounded-full overflow-hidden relative">
+                                    <div id="appointments-vereinbart-bar" class="h-full bg-skt-blue-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
+                                    <div id="appointments-gehalten-bar" class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: 0%;"></div>
                                 </div>
                             </div>
                             <div class="p-4 bg-skt-grey-light rounded-xl shadow-md">
                                 <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                                    <p class="text-sm text-skt-blue-light font-bold" data-tooltip="Geführte Bewerbungsgespräche">Bewerbungsgespräche</p>
+                                    <p class="text-sm text-skt-blue-light font-bold" data-tooltip="Grün: Gehaltene Gespräche. Grau: Geplante, noch offene Gespräche.">Bewerbungsgespräche</p>
                                     <p class="text-xl font-bold text-skt-blue mt-2 sm:mt-0"><span id="et-current">0</span>/<span id="et-goal">0</span></p>
                                 </div>
                                 <div id="interview-pills" class="flex flex-wrap gap-2 items-center"></div>
@@ -250,7 +268,7 @@
         const sheetDataName = "Daten";
         const sheetPromotionsName = "Anstehende Beförderungen";
 
-        const USER_FILTER_PREFIXES = ["geschäftsstelle", "bezirksleitung", "neuer ma", "wgst", "wbl", "ga", "jgst", "summe direktion", "rd königslehner"];
+        const USER_FILTER_PREFIXES = ["geschäftsstelle", "bezirksleitung", "neuer ma", "wgst", "wbl", "ga ", "jgst", "summe direktion", "rd königslehner"];
 
         const tierGoals = [
             { name: "T1", goal: 1250 },
@@ -285,15 +303,15 @@
             nextMilestone: document.getElementById('next-milestone'),
             weeklyProgressContainer: document.getElementById('weekly-progress-container'),
             ehProgressCircle: document.getElementById('progress-circle-eh'),
-            etProgressCircle: document.getElementById('progress-circle-et'),
-            ehPercentageText: document.getElementById('eh-percentage-text'),
-            etPercentageText: document.getElementById('et-percentage-text'),
-            ehCurrentDisplay: document.getElementById('eh-current'),
-            ehGoalDisplay: document.getElementById('eh-goal'),
+            prognosisCircleEh: document.getElementById('prognosis-circle-eh'), 
+            segmentDividersEh: document.getElementById('segment-dividers-eh'), 
+            ehCenterCurrent: document.getElementById('eh-center-current'),
+            ehCenterGoal: document.getElementById('eh-center-goal'),
             etCurrentDisplay: document.getElementById('et-current'),
             etGoalDisplay: document.getElementById('et-goal'),
-            atSollDisplay: document.getElementById('at-soll-display'),
-            atVerDisplay: document.getElementById('at-ver-display'),
+            appointmentsText: document.getElementById('appointments-text'),
+            appointmentsVereinbartBar: document.getElementById('appointments-vereinbart-bar'),
+            appointmentsGehaltenBar: document.getElementById('appointments-gehalten-bar'),
             employeeCountDisplay: document.getElementById('employee-count-display'),
             employeeSlotsContainer: document.getElementById('employee-slots-container'),
             employeeGoalStatus: document.getElementById('employee-goal-status'),
@@ -364,10 +382,10 @@
             const today = new Date();
             const year = today.getFullYear();
             const month = today.getMonth();
-            let startDate = getFirstWeekdayOfMonth(year, month, 4);
+            let startDate = getFirstWeekdayOfMonth(year, month, 4); // Thursday
             let nextMonth = (month + 1) % 12;
             let nextYear = year + Math.floor((month + 1)/12);
-            let endDate = getFirstWeekdayOfMonth(nextYear, nextMonth, 3);
+            let endDate = getFirstWeekdayOfMonth(nextYear, nextMonth, 3); // Wednesday
             if (endDate.getDate() === 1) endDate.setDate(endDate.getDate()+7);
             return { startDate, endDate };
         }
@@ -422,12 +440,13 @@
                     etGoal: Math.round(row[2]?.v || 0),
                     etCurrent: Math.round(row[3]?.v || 0),
                     atGoal: Math.round(row[4]?.v || 0),
-                    atCurrent: Math.round(row[5]?.v || 0),
+                    atVereinbart: Math.round(row[5]?.v || 0),
+                    atCurrent: Math.round(row[6]?.v || 0),
                     totalCurrentEh: Math.round(row[7]?.v || 0),
                     position: row[8]?.v || "N/A"
                 };
             } else {
-                personalData = { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atCurrent: 0, totalCurrentEh: 0, position: "N/A" };
+                personalData = { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atVereinbart: 0, atCurrent: 0, totalCurrentEh: 0, position: "N/A" };
                 setStatus(`Keine Daten für Benutzer "${userName}" gefunden.`, true);
             }
         }
@@ -489,6 +508,35 @@
                 }
             }
             leaderPromotionData = promotions;
+        }
+
+        function drawSegmentDividers() {
+            const { startDate, endDate } = getMonthlyCycleDates();
+            clearChildren(dom.segmentDividersEh);
+            const totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            const totalWeeks = Math.ceil(totalDays / 7);
+
+            for (let i = 1; i < totalWeeks; i++) {
+                const angle = i * (360 / totalWeeks);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                
+                const innerRadius = 35;
+                const strokeWidth = 4;
+                const innerEdgeRadius = innerRadius - (strokeWidth / 2);
+                const outerEdgeRadius = innerRadius + (strokeWidth / 2);
+
+                const x1 = 50 + innerEdgeRadius * Math.cos(angle * Math.PI / 180);
+                const y1 = 50 + innerEdgeRadius * Math.sin(angle * Math.PI / 180);
+                const x2 = 50 + outerEdgeRadius * Math.cos(angle * Math.PI / 180);
+                const y2 = 50 + outerEdgeRadius * Math.sin(angle * Math.PI / 180);
+
+                line.setAttribute('x1', x1);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', x2);
+                line.setAttribute('y2', y2);
+                
+                dom.segmentDividersEh.appendChild(line);
+            }
         }
 
 
@@ -568,21 +616,40 @@
         
         function updateMonthlyPlanningView(data) {
             updateWeeklyProgress();
-            animateValue(dom.ehCurrentDisplay, 0, data.ehCurrent, 1000, false);
-            animateValue(dom.etCurrentDisplay, 0, data.etCurrent, 1000, false);
-            animateValue(dom.atVerDisplay, 0, data.atCurrent, 1000, false);
-            dom.ehGoalDisplay.textContent = data.ehGoal;
-            dom.etGoalDisplay.textContent = data.etGoal;
-            dom.atSollDisplay.textContent = data.atGoal;
-            dom.ehPercentageText.textContent = `${Math.min(data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0, 100).toFixed(1)}%`;
-            dom.etPercentageText.textContent = `${Math.min(data.atGoal > 0 ? (data.atCurrent / data.atGoal * 100) : 0, 100).toFixed(1)}%`;
-            updateCircleProgress(dom.ehProgressCircle, 40, data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0);
-            updateCircleProgress(dom.etProgressCircle, 30, data.atGoal > 0 ? (data.atCurrent / data.atGoal * 100) : 0);
             
+            animateValue(dom.ehCenterCurrent, 0, data.ehCurrent, 1000, false);
+            dom.ehCenterGoal.textContent = data.ehGoal;
+            animateValue(dom.etCurrentDisplay, 0, data.etCurrent, 1000, false);
+            dom.etGoalDisplay.textContent = data.etGoal;
+            
+            // Update actual progress circle (outer)
+            const actualPercentage = data.ehGoal > 0 ? (data.ehCurrent / data.ehGoal * 100) : 0;
+            updateCircleProgress(dom.ehProgressCircle, 45, actualPercentage);
+            
+            // Update prognosis circle (inner)
+            const { startDate, endDate } = getMonthlyCycleDates();
+            const today = new Date();
+            const totalDaysInCycle = (endDate - startDate) / (1000 * 60 * 60 * 24);
+            const daysPassedInCycle = Math.max(0, (today - startDate) / (1000 * 60 * 60 * 24));
+            const timeElapsedPercentage = totalDaysInCycle > 0 ? (daysPassedInCycle / totalDaysInCycle) * 100 : 0;
+            updateCircleProgress(dom.prognosisCircleEh, 35, timeElapsedPercentage);
+
+            // Draw week dividers on the circle
+            drawSegmentDividers();
+
+            // Update appointments text
+            dom.appointmentsText.textContent = `${data.atCurrent} / ${data.atVereinbart} / ${data.atGoal}`;
+            
+            // Update appointments progress bars
+            const vereinbartPercent = data.atGoal > 0 ? (data.atVereinbart / data.atGoal) * 100 : 0;
+            const gehaltenPercent = data.atGoal > 0 ? (data.atCurrent / data.atGoal) * 100 : 0;
+            dom.appointmentsVereinbartBar.style.width = `${Math.min(vereinbartPercent, 100)}%`;
+            dom.appointmentsGehaltenBar.style.width = `${Math.min(gehaltenPercent, 100)}%`;
+
             clearChildren(dom.interviewPillsContainer);
             for(let i=0; i < data.etGoal; i++){
                 const pill = document.createElement('div');
-                pill.className = `px-3 py-1 text-white text-xs font-semibold rounded-full shadow-md ${i < data.etCurrent ? 'bg-skt-green-accent':'bg-skt-blue-light'}`;
+                pill.className = `px-3 py-1 text-white text-xs font-semibold rounded-full shadow-md ${i < data.etCurrent ? 'bg-skt-green-accent':'bg-skt-grey-medium'}`;
                 pill.textContent = i + 1;
                 dom.interviewPillsContainer.appendChild(pill);
             }
@@ -711,7 +778,8 @@
             const timePercent = (daysPassed / totalDays) * 100;
 
             if (progressPercent >= timePercent) return { text: 'Auf Kurs', colorClass: 'text-skt-green-accent' };
-            if (progressPercent >= timePercent * 0.75) return { text: 'Erreichung gefährdet', colorClass: 'text-skt-yellow-accent' };
+            // MODIFIED: Text for yellow state is now empty
+            if (progressPercent >= timePercent * 0.75) return { text: '', colorClass: 'text-skt-yellow-accent' };
             return { text: 'Ziele stark gefährdet', colorClass: 'text-skt-red-accent' };
         }
 
@@ -769,7 +837,7 @@
             const daysPassedInCycle = Math.max(0, (today - startDate) / (1000 * 60 * 60 * 24));
 
             const memberDataPromises = team.map(async (memberName) => {
-                const query = `select B, C, D, E, F, G, J where A = '${memberName.trim()}'`;
+                const query = `select B, C, D, E, F, G, H, J where A = '${memberName.trim()}'`;
                 const data = await fetchSheetQuery(sheetDataName, query);
                 if (data && data.table.rows.length > 0) {
                     const row = data.table.rows[0].c;
@@ -780,8 +848,9 @@
                         etGoal: Math.round(row[2]?.v || 0),
                         etCurrent: Math.round(row[3]?.v || 0),
                         atGoal: Math.round(row[4]?.v || 0),
-                        atCurrent: Math.round(row[5]?.v || 0),
-                        position: row[6]?.v || 'N/A'
+                        atVereinbart: Math.round(row[5]?.v || 0),
+                        atCurrent: Math.round(row[6]?.v || 0),
+                        position: row[7]?.v || 'N/A'
                     };
                 }
                 return null;
@@ -794,9 +863,10 @@
                 acc.etGoal += member.etGoal;
                 acc.etCurrent += member.etCurrent;
                 acc.atGoal += member.atGoal;
+                acc.atVereinbart += member.atVereinbart;
                 acc.atCurrent += member.atCurrent;
                 return acc;
-            }, { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atCurrent: 0 });
+            }, { ehGoal: 0, ehCurrent: 0, etGoal: 0, etCurrent: 0, atGoal: 0, atVereinbart: 0, atCurrent: 0 });
 
             // Team-Gesamtwerte berechnen, indem die persönlichen Daten des Leiters addiert werden
             teamData = {
@@ -805,6 +875,7 @@
                 etGoal: teamMembersTotal.etGoal + (personalData.etGoal || 0),
                 etCurrent: teamMembersTotal.etCurrent + (personalData.etCurrent || 0),
                 atGoal: teamMembersTotal.atGoal + (personalData.atGoal || 0),
+                atVereinbart: teamMembersTotal.atVereinbart + (personalData.atVereinbart || 0),
                 atCurrent: teamMembersTotal.atCurrent + (personalData.atCurrent || 0)
             };
 
@@ -857,35 +928,49 @@
         function createMemberCard(member, totalDaysInCycle, daysPassedInCycle) {
             const ehPercentage = member.ehGoal > 0 ? (member.ehCurrent / member.ehGoal * 100) : 0;
             const ehColorClass = getProgressColorClass(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
-            const atPercentage = member.atGoal > 0 ? (member.atCurrent / member.atGoal * 100) : 0;
-            const atColorClass = getProgressColorClass(member.atCurrent, member.atGoal, totalDaysInCycle, daysPassedInCycle);
             const prognosis = getPrognosis(member.ehCurrent, member.ehGoal, totalDaysInCycle, daysPassedInCycle);
             const memberId = member.name.replace(/[^a-zA-Z0-9]/g, '');
 
             const card = document.createElement('div');
             card.className = 'bg-white rounded-xl shadow-lg transition-shadow hover:shadow-xl';
             
+            const etPercentage = member.etGoal > 0 ? (member.etCurrent / member.etGoal) * 100 : 0;
             let etDetailsHtml = '';
             if (member.etGoal > 0) {
-                const etPercentage = (member.etCurrent / member.etGoal) * 100;
-                const etColorClass = getProgressColorClass(member.etCurrent, member.etGoal, totalDaysInCycle, daysPassedInCycle);
-                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-blue-light">${member.etCurrent} von ${member.etGoal} geführt</p><div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1"><div class="h-full ${etColorClass}" style="width: ${Math.min(etPercentage, 100)}%;"></div></div></div>`;
+                etDetailsHtml = `
+                    <div class="text-center">
+                        <p class="text-sm font-semibold text-skt-blue mb-1">Bewerbungsgespräche</p>
+                        <p class="text-md font-bold text-skt-blue">${member.etCurrent} / ${member.etGoal}</p>
+                        <p class="text-xs text-gray-500 mb-2">Gehalten / Ziel</p>
+                        <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden relative">
+                            <div class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(etPercentage, 100)}%;"></div>
+                        </div>
+                    </div>
+                `;
             } else {
-                etDetailsHtml = `<div><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
+                etDetailsHtml = `<div class="text-center flex flex-col justify-center h-full"><p class="text-sm font-semibold text-skt-blue">Bewerbungsgespräche</p><p class="text-xs text-skt-red-accent font-semibold mt-1">Im nächsten PG Ziele & Karriere besprechen.</p></div>`;
             }
+
+            const vereinbartPercent = member.atGoal > 0 ? (member.atVereinbart / member.atGoal) * 100 : 0;
+            const gehaltenPercent = member.atGoal > 0 ? (member.atCurrent / member.atGoal) * 100 : 0;
+            const atDetailsHtml = `
+                <div class="text-center">
+                    <p class="text-sm font-semibold text-skt-blue mb-1">Analysetermine</p>
+                    <p class="text-md font-bold text-skt-blue">${member.atCurrent} / ${member.atVereinbart} / ${member.atGoal}</p>
+                    <p class="text-xs text-gray-500 mb-2">Gehalten / Vereinbart / Soll</p>
+                    <div class="w-full bg-skt-grey-medium h-2.5 rounded-full overflow-hidden relative">
+                        <div class="h-full bg-skt-blue-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(vereinbartPercent, 100)}%;"></div>
+                        <div class="h-full bg-skt-green-accent absolute top-0 left-0 transition-all duration-700 ease-out" style="width: ${Math.min(gehaltenPercent, 100)}%;"></div>
+                    </div>
+                </div>
+            `;
 
             const details = document.createElement('div');
             details.className = 'team-member-details px-4';
             details.innerHTML = `
                 <div class="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">
                     ${etDetailsHtml}
-                    <div>
-                        <p class="text-sm font-semibold text-skt-blue">Analysetermine</p>
-                        <p class="text-xs text-skt-blue-light">${member.atCurrent} von ${member.atGoal} gemacht</p>
-                        <div class="w-full bg-skt-grey-medium h-2 rounded-full overflow-hidden mt-1">
-                            <div class="h-full ${atColorClass}" style="width: ${Math.min(atPercentage, 100)}%;"></div>
-                        </div>
-                    </div>
+                    ${atDetailsHtml}
                     <div class="md:col-span-2" id="leader-goal-${memberId}"></div>
                 </div>`;
 
@@ -898,7 +983,7 @@
                         <p class="text-sm text-skt-blue-light">${member.position}</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="font-semibold text-sm ${prognosis.colorClass}">${prognosis.text}</span>
+                        <span class="font-semibold text-sm ${prognosis.colorClass}" data-tooltip="Prognose basierend auf dem aktuellen Fortschritt im Verhältnis zur vergangenen Zeit im Monat.">${prognosis.text}</span>
                         <button data-username="${member.name}" class="switch-view-btn text-skt-blue-light hover:text-skt-blue-main transition-colors" title="Zur Ansicht wechseln"><i class="fas fa-eye"></i></button>
                         <i class="fas fa-chevron-down chevron-icon text-skt-blue-light"></i>
                     </div>
@@ -1001,6 +1086,7 @@
                 dom.employeeView.classList.remove('hidden');
                 updateMonthlyPlanningView(personalData);
                 updateEmployeeCareerView();
+                dom.monthlyPlanningTitle.textContent = "Deine Monatsplanung";
             }
 
             setStatus('');
@@ -1081,12 +1167,11 @@
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             populateUserDropdown();
-            const startButton = document.getElementById('start-dashboard-btn');
-            if (startButton) {
-                startButton.addEventListener('click', startDashboard);
-            } else {
-                console.error("Start button not found!");
-            }
+            dom.userDropdownSelect.addEventListener('change', () => {
+                if (dom.userDropdownSelect.value) {
+                    startDashboard();
+                }
+            });
         });
 
     </script>
